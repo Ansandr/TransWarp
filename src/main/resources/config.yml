@@ -1,0 +1,59 @@
+# тип сохранения информации о транспортах (yaml, todo: sql, mysql)
+storage_type: yaml
+
+
+# Виды транспорта тут будут
+transports:
+  city_bus:
+    # Максимальное расстояние перевозки (в блоках / метрах)
+    max_distance: 11000
+    # Минимальное, необходимое расстояние для перевозки (если меньше - не перевозить)
+    min_distance: 400
+    # Скорость км/час
+    speed: 30
+  intercity_bus:
+    max_distance: 474500
+    min_distance: 83800
+    speed: 70
+  launch:
+    max_distance: 30000
+    mix_distance: 1000
+    speed: 70
+  train:
+    max_distance: 425000
+    min_distance: 1000
+    speed: 140
+  helicopter:
+    max_distance: 425000
+    min_distance: 1000
+    speed: 225
+  airplane:
+    max_distance: 100000000
+    min_distance: 1000
+    speed: 800
+# Характеристики их реальной жизни. На самом деле в майнкрафте не такие больше миры на серверах ;)
+
+messages:
+  prefix: '&a[&9Transwarp&a] &f'
+  reloaded: 'TransWarp reloaded'
+  transport_set: 'Транспорт успешно установлен'
+  transport_type_not_initialized: 'Этот тип транспорта не задано в конфигурации!'
+  transport_not_found: 'Не найдено подходящего транспорта для вас'
+  no_perm: '&cНет прав!'
+  time_left_title: 'Вы приедете через'
+  time_left_subtitle: '{time}'
+  timer:
+    second: 'second'
+    seconds: 'seconds'
+    minute: 'minute'
+    minutes: 'minutes'
+  got_title: '&aУдачи'
+  got_subtitle: '&eВы прибыли на место назначения'
+  you_got: '&6Вы приехали. Удачного дня'
+  help: |-
+    /transwarp reload
+    /settransport <имя> <категория>
+
+
+# do not touch
+config_version: 1.0.0

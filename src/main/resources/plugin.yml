@@ -1,0 +1,15 @@
+name: TransWarp
+version: ${project.version}
+main: me.ansandr.transwarp.TransWarp
+api-version: 1.17
+depend: [ Essentials]
+softdepend: [ Vault ]
+authors: [ Ansandr ]
+description: Introduces a transport system for realystic and quickly adventure around the world
+
+commands:
+  settransport:
+    usage: /<command> <transName> <transportType>
+    aliases:
+      - settrans
+  transwarp:
