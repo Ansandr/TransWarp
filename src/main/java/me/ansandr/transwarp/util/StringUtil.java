@@ -32,11 +32,11 @@ public class StringUtil {
             int minute = delay/60;
             int second = delay%60;
             if (second == 0) {
-                time = String.format("%01d %01s",
+                time = String.format("%d %s",
                         second,
                         ((second>1) ? tl("timer.seconds") : tl("timer.second")));
             } else {
-                time = String.format("%01d %01s %02d %02s",
+                time = String.format("%d %s %d %s",
                         minute,
                         ((minute>1) ? tl("timer.minutes") : tl("timer.minute")),
                         second,
@@ -44,7 +44,7 @@ public class StringUtil {
             }
         } else {
             int second = delay;
-            time = String.format("%01d %01s",
+            time = String.format("%d %s",
                     second,
                     ((second>1) ? tl("timer.seconds") : tl("timer.second")));
         }
