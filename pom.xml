@@ -6,7 +6,7 @@
 
     <groupId>me.ansandr</groupId>
     <artifactId>transwarp</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.2</version>
     <packaging>jar</packaging>
 
     <name>TransWarp</name>
@@ -69,7 +69,7 @@
         </repository>
         <repository>
             <id>ess-repo</id>
-            <url>https://repo.essentialsx.net/releases/</url>
+            <url>https://repo.essentialsx.net/snapshots/</url>
         </repository>
     </repositories>
 
@@ -81,15 +81,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.ess3</groupId>
+            <groupId>net.essentialsx</groupId>
             <artifactId>EssentialsX</artifactId>
-            <version>2.18.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.ess3</groupId>
-            <artifactId>EssentialsXSpawn</artifactId>
-            <version>2.18.2</version>
+            <version>2.19.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

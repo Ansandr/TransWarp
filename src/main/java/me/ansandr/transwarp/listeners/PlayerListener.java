@@ -10,6 +10,7 @@ import net.ess3.api.IEssentials;
 import net.ess3.api.InvalidWorldException;
 import net.ess3.api.events.UserTeleportHomeEvent;
 import net.ess3.api.events.UserWarpEvent;
+import net.essentialsx.api.v2.events.UserTeleportSpawnEvent;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -21,6 +22,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.NumberConversions;
+
+import static me.ansandr.transwarp.util.MessageManager.tl;
 
 public class PlayerListener implements Listener {
 
@@ -61,6 +64,14 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onSpawn(UserTeleportSpawnEvent e) {
+        e.setCancelled(true);
+        Player p = e.getUser().getBase();
+        Location spawnLoc = e.getSpawnLocation();
+        transport(p, spawnLoc);
+    }
+
+    @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
         if (e.getMessage().equals("transport")) {
             Player p = e.getPlayer();
@@ -70,21 +81,31 @@ public class PlayerListener implements Listener {
         }
     }
 
-    private void transport(Player p, Location warpLoc) {
+    private void transport(Player p, Location target) {
         Location playerLoc = p.getLocation();
 
-        TransportFinder finder = new TransportFinder(plugin, playerLoc, warpLoc);
+        if (target.getWorld() != playerLoc.getWorld()) {//TODO придумать медленный делепортер через конфиг
+            /*
+            if (чета там) {
+                тп телепорт потом target
+            }
+             */
+            p.sendMessage(tl("invalid_world"));
+            return;
+        }
+
+        TransportFinder finder = new TransportFinder(plugin, playerLoc, target);
         //Получить местоположение машини
         Location transLoc = null;
         try {
-            transLoc = finder.find(p, warpLoc);
+            transLoc = finder.find(p, target);//TODO ищется дважды
         } catch (TransportNotFoundException ex) {
             p.sendMessage(ex.getMessage());
             return;
         }
         //Получить объект транспорта
-        Transport transport = new Transport(finder.getTransportType(), p, transLoc, warpLoc,
-                finder.getDistance(playerLoc, warpLoc));//TODO ищется дважды
+        Transport transport = new Transport(finder.getTransportType(), p, transLoc, target,
+                finder.getDistance(playerLoc, target));//TODO ищется дважды
         //Телепортировать в транспорт
         p.teleport(transLoc);
         // ждать время
@@ -92,9 +113,9 @@ public class PlayerListener implements Listener {
             @Override
             public void run() {
                 p.addPotionEffect(
-                        new PotionEffect(PotionEffectType.SLOW, 100, 1, false, false));
+                        new PotionEffect(PotionEffectType.SLOW, 80, 2, false, false));
             }
         }.runTaskLater(plugin, 5);
-        new TrasportingTask(p, warpLoc, NumberConversions.toInt(transport.getTime())).runTaskTimer(plugin, 20, 20);
+        new TrasportingTask(p, target, NumberConversions.toInt(transport.getTime())).runTaskTimer(plugin, 20, 20);
     }
 }

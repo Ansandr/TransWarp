@@ -3,7 +3,7 @@ version: ${project.version}
 main: me.ansandr.transwarp.TransWarp
 api-version: 1.17
 depend: [ Essentials]
-softdepend: [ Vault ]
+softdepend: [ Vault, EssentialsSpawn ]
 authors: [ Ansandr ]
 description: Introduces a transport system for realystic and quickly adventure around the world
 
