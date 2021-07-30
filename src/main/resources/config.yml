@@ -11,6 +11,8 @@ transports:
     min_distance: 400
     # Скорость км/час
     speed: 30
+    # Стоимость поездки км/деньга
+    cost: 2
   intercity_bus:
     max_distance: 474500
     min_distance: 83800
@@ -31,7 +33,9 @@ transports:
     max_distance: 100000000
     min_distance: 1000
     speed: 800
-# Характеристики их реальной жизни. На самом деле в майнкрафте не такие больше миры на серверах ;)
+# Характеристики приблизительные из реальной жизни. На самом деле в майнкрафте не такие больше миры на серверах ;)
+menu:
+  enabled: true
 
 messages:
   prefix: '&a[&9Transwarp&a] &f'

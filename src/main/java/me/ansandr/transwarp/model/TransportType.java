@@ -9,12 +9,14 @@ public class TransportType {
     private int maxDistance;
     private int minDistance;
     private double speed;
+    private double price;
 
-    public TransportType(String name, int maxDistance, int minDistance, double speed) {
+    public TransportType(String name, int maxDistance, int minDistance, double speed, double price) {
         this.name = name;
         this.maxDistance = maxDistance;
         this.minDistance = minDistance;
         this.speed = speed;
+        this.price = price;
     }
 
     public String getName() {
@@ -31,5 +33,9 @@ public class TransportType {
 
     public double getSpeed() {
         return speed;
+    }
+
+    public double getPrice() {
+        return price;
     }
 }
