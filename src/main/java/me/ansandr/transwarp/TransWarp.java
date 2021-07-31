@@ -1,9 +1,11 @@
 package me.ansandr.transwarp;
 
+import com.live.bemmamin.gps.api.GPSAPI;
 import me.ansandr.transwarp.commands.CommandReload;
 import me.ansandr.transwarp.commands.CommandSetTransport;
 import me.ansandr.transwarp.configuration.StorageConfig;
 import me.ansandr.transwarp.hooks.EssentialsHook;
+import me.ansandr.transwarp.hooks.GPSHook;
 import me.ansandr.transwarp.hooks.VaultHook;
 import me.ansandr.transwarp.listeners.PlayerListener;
 import me.ansandr.transwarp.model.TransportType;
@@ -11,11 +13,14 @@ import me.ansandr.transwarp.storage.SQLStorageManager;
 import me.ansandr.transwarp.storage.StorageManager;
 import me.ansandr.transwarp.storage.YamlStorageManager;
 import me.ansandr.transwarp.util.MessageManager;
+import me.ansandr.util.menu.Menu;
+import me.ansandr.util.menu.MenuHolder;
 import net.ess3.api.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -28,6 +33,7 @@ public final class TransWarp extends JavaPlugin {
     private TransportTypeManager typeManager;
     public static String rawVersion;
     public static int version;
+    private static Map<Player, MenuHolder> menuHolders = new HashMap<>();
 
     //Config
     private FileConfiguration config;
@@ -36,8 +42,11 @@ public final class TransWarp extends JavaPlugin {
     //Hooks
     private VaultHook vaultHook;
     private EssentialsHook essentialsHook;
+    private GPSHook gpsHook;
     //Storage
     private StorageManager storage;
+
+    private boolean menuEnabled;
 
 
     @Override
@@ -50,6 +59,7 @@ public final class TransWarp extends JavaPlugin {
 
         setupEssentials();
         setupVault();
+        setupGPS();
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
@@ -80,6 +90,7 @@ public final class TransWarp extends JavaPlugin {
             storage = new SQLStorageManager();//TODO
         }
         loadTransportType();
+        menuEnabled = config.getBoolean("menu.enabled");
     }
 
     @Override
@@ -96,7 +107,8 @@ public final class TransWarp extends JavaPlugin {
                     key,
                     transports.getInt(key + ".max_distance"),
                     transports.getInt(key + ".min_distance"),
-                    transports.getDouble(key + ".speed")
+                    transports.getDouble(key + ".speed"),
+                    transports.getDouble(key + ".cost")
             );
             typeList.add(key);
             typeMap.put(key, transportType);
@@ -122,6 +134,14 @@ public final class TransWarp extends JavaPlugin {
         return essentialsHook.hooked();
     }
 
+    private boolean setupGPS() {
+        if (!getServer().getPluginManager().getPlugin("GPS").isEnabled()) {
+            return false;
+        }
+        gpsHook = new GPSHook(this);
+        return gpsHook.hooked();
+    }
+
     public static int calculateVersion(String s) {
         int ver = 0;
         String[] version = s.split("\\.");
@@ -132,6 +152,22 @@ public final class TransWarp extends JavaPlugin {
         } catch (NumberFormatException ignored) {}
 
         return ver;
+    }
+
+    public static void createHolder(Player player) {
+        MenuHolder holder = new MenuHolder(player);
+        menuHolders.put(player, holder);
+    }
+
+    public static MenuHolder getHolder(Player player) {
+        if (menuHolders.containsKey(player)) {
+            return menuHolders.get(player);
+        }
+        return null;
+    }
+
+    public static Map<Player, MenuHolder> getMenuHolders() {
+        return menuHolders;
     }
 
     public String getStorageType() {
@@ -146,12 +182,20 @@ public final class TransWarp extends JavaPlugin {
         return storage;
     }
 
+    public boolean isMenuEnabled() {
+        return menuEnabled;
+    }
+
     public Economy getEconomy() {
         return vaultHook.getEconomy();
     }
 
     public IEssentials getEssentials() {
         return essentialsHook.getEssentials();
+    }
+
+    public GPSAPI getGPS() {
+        return gpsHook.getApi();
     }
 
     public static TransWarp getInstance() {
