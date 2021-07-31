@@ -2,10 +2,13 @@ package me.ansandr.transwarp.listeners;
 
 import com.earth2me.essentials.commands.WarpNotFoundException;
 import me.ansandr.transwarp.TransWarp;
+import me.ansandr.transwarp.menu.TransChosingMenu;
 import me.ansandr.transwarp.model.Transport;
 import me.ansandr.transwarp.task.TrasportingTask;
 import me.ansandr.transwarp.util.TransportFinder;
 import me.ansandr.transwarp.util.TransportNotFoundException;
+import me.ansandr.transwarp.util.TransportUtils;
+import me.ansandr.util.menu.Menu;
 import net.ess3.api.IEssentials;
 import net.ess3.api.InvalidWorldException;
 import net.ess3.api.events.UserTeleportHomeEvent;
@@ -16,8 +19,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,77 +50,102 @@ public class PlayerListener implements Listener {
     // When player use warp
     @EventHandler
     public void onWarp(UserWarpEvent e) throws WarpNotFoundException, InvalidWorldException {
-        e.setCancelled(true);
         Player p = e.getUser().getBase();
-        //Получить местоположение варпа
-        String warpName = e.getWarp();
-        Location warpLoc = ess.getWarps().getWarp(warpName);
-
-        transport(p, warpLoc);
-    }
-
-    @EventHandler
-    public void onHomeTeleport(UserTeleportHomeEvent e) {
-        e.setCancelled(true);
-        Player p = e.getUser().getBase();
-        Location homeLoc = e.getHomeLocation();
-
-        transport(p, homeLoc);
-    }
-
-    @EventHandler
-    public void onSpawn(UserTeleportSpawnEvent e) {
-        e.setCancelled(true);
-        Player p = e.getUser().getBase();
-        Location spawnLoc = e.getSpawnLocation();
-        transport(p, spawnLoc);
-    }
-
-    @EventHandler
-    public void onCommand(PlayerCommandPreprocessEvent e) {
-        if (e.getMessage().equals("transport")) {
-            Player p = e.getPlayer();
-            if (!p.isOp()) {
-                p.sendMessage("Make by Ansandr");
-            }
-        }
-    }
-
-    private void transport(Player p, Location target) {
-        Location playerLoc = p.getLocation();
-
-        if (target.getWorld() != playerLoc.getWorld()) {//TODO придумать медленный делепортер через конфиг
-            /*
-            if (чета там) {
-                тп телепорт потом target
-            }
-             */
-            p.sendMessage(tl("invalid_world"));
+        if (p.hasPermission("transwarp.bypass")) {
             return;
         }
-
-        TransportFinder finder = new TransportFinder(plugin, playerLoc, target);
-        //Получить местоположение машини
-        Location transLoc = null;
+        e.setCancelled(true);
+        String warpName = e.getWarp();
+        Location warpLoc = ess.getWarps().getWarp(warpName);
+        Transport transport = null;
         try {
-            transLoc = finder.find(p, target);//TODO ищется дважды
+            transport = TransportUtils.getTransport(p.getLocation(), warpLoc);
         } catch (TransportNotFoundException ex) {
             p.sendMessage(ex.getMessage());
             return;
         }
-        //Получить объект транспорта
-        Transport transport = new Transport(finder.getTransportType(), p, transLoc, target,
-                finder.getDistance(playerLoc, target));//TODO ищется дважды
-        //Телепортировать в транспорт
-        p.teleport(transLoc);
-        // ждать время
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                p.addPotionEffect(
-                        new PotionEffect(PotionEffectType.SLOW, 80, 2, false, false));
+        transport.setPlayer(p);
+        double cost = transport.getCost();
+
+        if (plugin.isMenuEnabled()) {
+            TransWarp.createHolder(p);
+            new TransChosingMenu(TransWarp.getHolder(p), cost, warpName, plugin);
+        }
+        TransportUtils.transport(transport, plugin);
+    }
+
+    @EventHandler
+    public void onHomeTeleport(UserTeleportHomeEvent e) {
+        Player p = e.getUser().getBase();
+        if (p.hasPermission("transwarp.bypass")) {
+            return;
+        }
+        e.setCancelled(true);
+        Location homeLoc = e.getHomeLocation();
+        Transport transport = null;
+        try {
+            transport = TransportUtils.getTransport(p.getLocation(), homeLoc);
+        } catch (TransportNotFoundException ex) {
+            p.sendMessage(ex.getMessage());
+            return;
+        }
+        transport.setPlayer(p);
+        double cost = transport.getCost();
+
+        if (plugin.isMenuEnabled()) {
+            TransWarp.createHolder(p);
+            new TransChosingMenu(TransWarp.getHolder(p), cost, e.getHomeName(), plugin);
+        }
+        TransportUtils.transport(transport, plugin);
+    }
+
+    @EventHandler
+    public void onSpawn(UserTeleportSpawnEvent e) {
+        Player p = e.getUser().getBase();
+        if (p.hasPermission("transwarp.bypass")) {
+            return;
+        }
+        e.setCancelled(true);
+        Location spawnLoc = e.getSpawnLocation();
+        Transport transport = null;
+        try {
+            transport = TransportUtils.getTransport(p.getLocation(), spawnLoc);
+        } catch (TransportNotFoundException ex) {
+            p.sendMessage(ex.getMessage());
+            return;
+        }
+        transport.setPlayer(p);
+        double cost = transport.getCost();
+
+        if (plugin.isMenuEnabled()) {
+            TransWarp.createHolder(p);
+            new TransChosingMenu(TransWarp.getHolder(p), cost, "Spawn", plugin);//TODO
+        }
+        TransportUtils.transport(transport, plugin);
+    }
+
+    @EventHandler
+    public void onMenuClick(InventoryClickEvent e) {
+        Player p = (Player) e.getWhoClicked();
+
+        InventoryHolder holder = e.getClickedInventory().getHolder();
+        if (holder == plugin.getHolder(p)) {
+            if (e.getCurrentItem() == null)
+                return;
+            // Choose menu
+            Menu menu = plugin.getMenuHolders().get(p).getMenu();
+            menu.handleMenu(e);
+        }
+    }
+
+
+    @EventHandler
+    public void onCommand(PlayerCommandPreprocessEvent e) {
+        if (e.getMessage().equals("transwarp")) {
+            Player p = e.getPlayer();
+            if (!p.isOp()) {
+                p.sendMessage("Made by Ansandr");
             }
-        }.runTaskLater(plugin, 5);
-        new TrasportingTask(p, target, NumberConversions.toInt(transport.getTime())).runTaskTimer(plugin, 20, 20);
+        }
     }
 }

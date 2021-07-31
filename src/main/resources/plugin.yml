@@ -1,7 +1,7 @@
 name: TransWarp
 version: ${project.version}
 main: me.ansandr.transwarp.TransWarp
-api-version: 1.17
+api-version: 1.13
 depend: [ Essentials]
 softdepend: [ Vault, EssentialsSpawn ]
 authors: [ Ansandr ]
@@ -12,4 +12,13 @@ commands:
     usage: /<command> <transName> <transportType>
     aliases:
       - settrans
+    description: Установить транспорт на вашем месте
+  transport:
+    description: Приехать на транспорте
   transwarp:
+permissions:
+  transwarp.bypass:
+    description: Позволяет игроку игнорировать транспорт
+    default: false
+  transwarp.fast:
+    description: Поволяет игроку выбирать моментальную телепортироватацию на точку

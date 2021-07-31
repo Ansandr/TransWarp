@@ -27,14 +27,15 @@ public class TransportTypeManager {
      * @return TransportType
      */
     public TransportType getByDistance(double distance) throws TransportNotFoundException {
-
+        if (availableTypes == null) throw new TransportNotFoundException();
         for(TransportType type : availableTypes.values()) {
             //если minDistance <= distance <= maxDistance
-            if (type.getMinDistance() <= distance && distance <= type.getMaxDistance()) {
-                return type;
+            if (type.getMinDistance() <= distance) {
+                if  (distance <= type.getMaxDistance()) {
+                    return type;
+                }
             }
         }
-        if (availableTypes == null) throw new TransportNotFoundException();
         return null;
     }
 

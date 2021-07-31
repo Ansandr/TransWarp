@@ -7,19 +7,28 @@ import org.bukkit.entity.Player;
 public class Transport {
 
     private TransportType type;
-    private Player player;
+    private Player player;//Nullable
     private Location transLoc;
-    private Location warpLoc;
+    private Location targetLoc;
     /** distance to target in blocks*/
     private double distance;
     private double time;
     private double cost;
 
-    public Transport(TransportType type, Player passenger, Location transLoc, Location warpLoc, double distance) {
+    public Transport(TransportType type, Player passenger, Location transLoc, Location targetLoc, double distance) {
         this.transLoc = transLoc;
-        this.warpLoc = warpLoc;
+        this.targetLoc = targetLoc;
         this.type = type;
         this.player = passenger;
+        this.distance = distance;
+        this.time = calculateTime();
+        this.cost = calculateCost();
+    }
+
+    public Transport(TransportType type, Location transLoc, Location targetLoc, double distance) {
+        this.transLoc = transLoc;
+        this.targetLoc = targetLoc;
+        this.type = type;
         this.distance = distance;
         this.time = calculateTime();
         this.cost = calculateCost();
@@ -40,8 +49,20 @@ public class Transport {
         return type.getPrice() * (distance/1000);
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public Location getTransLocation() {
         return transLoc;
+    }
+
+    public Location getTargetLoc() {
+        return targetLoc;
     }
 
     public TransportType getType() {
@@ -56,7 +77,7 @@ public class Transport {
         return time;
     }
 
-    public int getCost() {
+    public double getCost() {
         return cost;
     }
 }

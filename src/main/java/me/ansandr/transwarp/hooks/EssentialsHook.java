@@ -9,7 +9,6 @@ public class EssentialsHook {
 
     public EssentialsHook() {
         essentials = (IEssentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
-
     }
 
     public IEssentials getEssentials() {

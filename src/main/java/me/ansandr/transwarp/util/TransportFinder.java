@@ -24,27 +24,28 @@ public class TransportFinder {
 
     private Location playerLoc;
     private TransportType type;
+    public double distance;
 
-    public TransportFinder(TransWarp plugin, Location playerLoc, Location warpLoc) {
+    public TransportFinder(Location playerLoc, Location targetLoc, TransWarp plugin) {
         this.plugin = plugin;
         this.storage = plugin.getStorage();
         this.playerLoc = playerLoc;
+        distance = getDistance(playerLoc, targetLoc);
     }
 
-    //Получить местоположение машини
-    public Location find(Player player, Location warpLoc) throws TransportNotFoundException {
-        //Узнать длину между игроков и варпом
-        double distance = getDistance(playerLoc, warpLoc);//Длина между игроком и варп
-
+    /**
+     * Получить местоположение машини
+     */
+    public Location findTransport(Location playerLoc, Location warpLoc) throws TransportNotFoundException {
         //Выбрать тип транспорта исходя из длины
         type = plugin.getTypeManager().getByDistance(distance);
         if (type == null) {
-            throw new TransportNotFoundException();
+            throw new TransportNotFoundException();//TODO локализация
         }
         //Собрать все транспорта одного типа
         Set<String> transportSet = storage.getTransports(type.getName());
         if (transportSet == null) {
-            throw new TransportNotFoundException();
+            throw new TransportNotFoundException();//TODO локализация
         }
         //Выбрать случайный транспорт из списка
         String transportName = getRandom(transportSet);

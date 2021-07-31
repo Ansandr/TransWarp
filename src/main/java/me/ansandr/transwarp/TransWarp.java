@@ -26,6 +26,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * TODO API for plugin
+ */
 public final class TransWarp extends JavaPlugin {
 
     private static TransWarp instance;
@@ -172,7 +175,7 @@ public final class TransWarp extends JavaPlugin {
 
     public String getStorageType() {
         return config.getString("storage_type").toLowerCase(Locale.ROOT);
-    }
+    }//TODO Рефакторинг
 
     public TransportTypeManager getTypeManager() {
         return typeManager;
@@ -184,7 +187,7 @@ public final class TransWarp extends JavaPlugin {
 
     public boolean isMenuEnabled() {
         return menuEnabled;
-    }
+    }//TODO Рефакторинг
 
     public Economy getEconomy() {
         return vaultHook.getEconomy();
@@ -192,6 +195,10 @@ public final class TransWarp extends JavaPlugin {
 
     public IEssentials getEssentials() {
         return essentialsHook.getEssentials();
+    }
+
+    public GPSHook getGPSHook() {
+        return gpsHook;
     }
 
     public GPSAPI getGPS() {

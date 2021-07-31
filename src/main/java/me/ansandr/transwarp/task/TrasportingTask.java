@@ -10,12 +10,12 @@ import static me.ansandr.transwarp.util.MessageManager.tl;
 public class TrasportingTask extends BukkitRunnable {
 
     private Player player;
-    private Location warpLoc;
+    private Location targetLoc;
     private int delay;
 
-    public TrasportingTask(Player player, Location warpLoc, int delay) {
+    public TrasportingTask(Player player, Location targetLoc, int delay) {
         this.player = player;
-        this.warpLoc = warpLoc;
+        this.targetLoc = targetLoc;
         this.delay = delay;
     }
 
@@ -36,7 +36,7 @@ public class TrasportingTask extends BukkitRunnable {
     }
 
     private void end() {//Тп на варв
-        player.teleport(warpLoc);
+        player.teleport(targetLoc);
         player.sendTitle(tl("got_title"), tl("got_subtitle"), 10, 300, 30);
         player.sendMessage(tl("you_got"));
     }
