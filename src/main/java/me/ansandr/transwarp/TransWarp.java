@@ -1,19 +1,20 @@
 package me.ansandr.transwarp;
 
 import com.live.bemmamin.gps.api.GPSAPI;
-import me.ansandr.transwarp.commands.CommandReload;
 import me.ansandr.transwarp.commands.CommandSetTransport;
+import me.ansandr.transwarp.commands.CommandTranswarp;
+import me.ansandr.transwarp.configuration.Settings;
 import me.ansandr.transwarp.configuration.StorageConfig;
 import me.ansandr.transwarp.hooks.EssentialsHook;
 import me.ansandr.transwarp.hooks.GPSHook;
 import me.ansandr.transwarp.hooks.VaultHook;
 import me.ansandr.transwarp.listeners.PlayerListener;
+import me.ansandr.transwarp.model.Transport;
 import me.ansandr.transwarp.model.TransportType;
 import me.ansandr.transwarp.storage.SQLStorageManager;
 import me.ansandr.transwarp.storage.StorageManager;
 import me.ansandr.transwarp.storage.YamlStorageManager;
 import me.ansandr.transwarp.util.MessageManager;
-import me.ansandr.util.menu.Menu;
 import me.ansandr.util.menu.MenuHolder;
 import net.ess3.api.IEssentials;
 import net.milkbowl.vault.economy.Economy;
@@ -32,14 +33,15 @@ import java.util.logging.Logger;
 public final class TransWarp extends JavaPlugin {
 
     private static TransWarp instance;
-    private final Logger log = this.getLogger();
+    private final Logger LOGGER = getLogger();
     private TransportTypeManager typeManager;
-    public static String rawVersion;
-    public static int version;
+
     private static Map<Player, MenuHolder> menuHolders = new HashMap<>();
+    private static Map<Player, Transport> transports = new HashMap<>();
 
     //Config
     private FileConfiguration config;
+    private Settings settings;
     //Localization
     private MessageManager messageManager;
     //Hooks
@@ -49,14 +51,11 @@ public final class TransWarp extends JavaPlugin {
     //Storage
     private StorageManager storage;
 
-    private boolean menuEnabled;
-
-
     @Override
     public void onEnable() {
 
-        onReload();
-
+        saveDefaultConfig();
+        settings = new Settings(this);
         messageManager = new MessageManager(this);
         messageManager.onEnable();
 
@@ -69,31 +68,19 @@ public final class TransWarp extends JavaPlugin {
         CommandSetTransport setTransport = new CommandSetTransport(this);
         getCommand("settransport").setExecutor(setTransport);
         getCommand("settransport").setTabCompleter(setTransport);
-        getCommand("transwarp").setExecutor(new CommandReload(this));
+        getCommand("transwarp").setExecutor(new CommandTranswarp(this));
         instance = this;
     }
 
-    public void onReload() {
-        saveDefaultConfig();
-        this.reloadConfig();
-        this.config = getConfig();
-        Configuration def = getConfig().getDefaults();
-
-        rawVersion = def.getString("config_version");
-        version = calculateVersion(rawVersion);
-
-        if (calculateVersion(config.getString("config_version")) < version) {
-            log.warning("Config is outdated!");
-        }
-
-        if (getStorageType().equals("yaml")) {
+    public void reload() {
+        if (getSettings().getStorageType().equals("yaml")) {
             StorageConfig storageConfig = new StorageConfig(this);
             storage = new YamlStorageManager(storageConfig);
-        } else if (getStorageType().equals("sql")) {
+        } else if (getSettings().getStorageType().equals("sql")) {
             storage = new SQLStorageManager();//TODO
         }
+
         loadTransportType();
-        menuEnabled = config.getBoolean("menu.enabled");
     }
 
     @Override
@@ -103,7 +90,6 @@ public final class TransWarp extends JavaPlugin {
 
     private void loadTransportType() {
         ConfigurationSection transports = config.getConfigurationSection("transports");
-        List<String> typeList = new ArrayList<>();
         Map<String, TransportType> typeMap = new HashMap<>();
         for (String key : transports.getKeys(false)) {//TODO Может быть null
             TransportType transportType = new TransportType(
@@ -113,11 +99,9 @@ public final class TransWarp extends JavaPlugin {
                     transports.getDouble(key + ".speed"),
                     transports.getDouble(key + ".cost")
             );
-            typeList.add(key);
             typeMap.put(key, transportType);
-
         }
-        typeManager = new TransportTypeManager(this, typeList, typeMap);
+        typeManager = new TransportTypeManager(this, typeMap);
     }
 
     private boolean setupVault() {
@@ -138,23 +122,15 @@ public final class TransWarp extends JavaPlugin {
     }
 
     private boolean setupGPS() {
-        if (!getServer().getPluginManager().getPlugin("GPS").isEnabled()) {
+        if (getServer().getPluginManager().getPlugin("GPS") == null) {
             return false;
         }
         gpsHook = new GPSHook(this);
         return gpsHook.hooked();
     }
 
-    public static int calculateVersion(String s) {
-        int ver = 0;
-        String[] version = s.split("\\.");
-        try {
-            ver += Integer.parseInt(version[0]) * 1000;
-            ver += Integer.parseInt(version[1]) * 100;
-            ver += Integer.parseInt(version[2]);
-        } catch (NumberFormatException ignored) {}
-
-        return ver;
+    public Settings getSettings() {
+        return settings;
     }
 
     public static void createHolder(Player player) {
@@ -173,9 +149,6 @@ public final class TransWarp extends JavaPlugin {
         return menuHolders;
     }
 
-    public String getStorageType() {
-        return config.getString("storage_type").toLowerCase(Locale.ROOT);
-    }//TODO Рефакторинг
 
     public TransportTypeManager getTypeManager() {
         return typeManager;
@@ -184,10 +157,6 @@ public final class TransWarp extends JavaPlugin {
     public StorageManager getStorage() {
         return storage;
     }
-
-    public boolean isMenuEnabled() {
-        return menuEnabled;
-    }//TODO Рефакторинг
 
     public Economy getEconomy() {
         return vaultHook.getEconomy();

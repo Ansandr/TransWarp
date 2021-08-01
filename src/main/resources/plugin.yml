@@ -16,6 +16,7 @@ commands:
   transport:
     description: Приехать на транспорте
   transwarp:
+    description: Главная комманда
 permissions:
   transwarp.bypass:
     description: Позволяет игроку игнорировать транспорт

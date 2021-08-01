@@ -11,13 +11,11 @@ import java.util.Set;
 public class TransportTypeManager {
 
     public static Map<String, TransportType> typeMap;
-    public static List<String> typeList;
 
     public Map<String, TransportType> availableTypes;
 
-    public TransportTypeManager(TransWarp plugin, List<String> typeList, Map<String, TransportType> typeMap) {
+    public TransportTypeManager(TransWarp plugin, Map<String, TransportType> typeMap) {
         TransportTypeManager.typeMap = typeMap;
-        TransportTypeManager.typeList = typeList;
         availableTypes = putSetToMap(plugin.getStorage().getTransportTypes());
     }
 

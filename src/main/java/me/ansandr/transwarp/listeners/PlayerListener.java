@@ -4,8 +4,6 @@ import com.earth2me.essentials.commands.WarpNotFoundException;
 import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.menu.TransChosingMenu;
 import me.ansandr.transwarp.model.Transport;
-import me.ansandr.transwarp.task.TrasportingTask;
-import me.ansandr.transwarp.util.TransportFinder;
 import me.ansandr.transwarp.util.TransportNotFoundException;
 import me.ansandr.transwarp.util.TransportUtils;
 import me.ansandr.util.menu.Menu;
@@ -23,12 +21,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.NumberConversions;
-
-import static me.ansandr.transwarp.util.MessageManager.tl;
 
 public class PlayerListener implements Listener {
 
@@ -42,7 +34,7 @@ public class PlayerListener implements Listener {
         this.config = plugin.getConfig();
     }
 
-    @EventHandler
+    @EventHandler//TODO commit
     public void onLeft(PlayerQuitEvent e) {
 
     }
@@ -64,10 +56,10 @@ public class PlayerListener implements Listener {
             p.sendMessage(ex.getMessage());
             return;
         }
-        transport.setPlayer(p);
+        transport.setPassenger(p);
         double cost = transport.getCost();
 
-        if (plugin.isMenuEnabled()) {
+        if (plugin.getSettings().isMenuEnable()) {
             TransWarp.createHolder(p);
             new TransChosingMenu(TransWarp.getHolder(p), cost, warpName, plugin);
         }
@@ -89,10 +81,10 @@ public class PlayerListener implements Listener {
             p.sendMessage(ex.getMessage());
             return;
         }
-        transport.setPlayer(p);
+        transport.setPassenger(p);
         double cost = transport.getCost();
 
-        if (plugin.isMenuEnabled()) {
+        if (plugin.getSettings().isMenuEnable()) {
             TransWarp.createHolder(p);
             new TransChosingMenu(TransWarp.getHolder(p), cost, e.getHomeName(), plugin);
         }
@@ -114,10 +106,10 @@ public class PlayerListener implements Listener {
             p.sendMessage(ex.getMessage());
             return;
         }
-        transport.setPlayer(p);
+        transport.setPassenger(p);
         double cost = transport.getCost();
 
-        if (plugin.isMenuEnabled()) {
+        if (plugin.getSettings().isMenuEnable()) {
             TransWarp.createHolder(p);
             new TransChosingMenu(TransWarp.getHolder(p), cost, "Spawn", plugin);//TODO
         }
