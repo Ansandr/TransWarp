@@ -5,7 +5,6 @@ import me.ansandr.transwarp.model.TransportType;
 import me.ansandr.transwarp.storage.StorageManager;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.util.NumberConversions;
 
 import java.util.Iterator;
