@@ -2,10 +2,13 @@ package me.ansandr.transwarp.commands;
 
 import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.TransportTypeManager;
+import me.ansandr.transwarp.model.Transport;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import static com.earth2me.essentials.I18n.tl;
 
 public class CommandTranswarp implements CommandExecutor {
 
@@ -23,20 +26,31 @@ public class CommandTranswarp implements CommandExecutor {
         }
         if (args[0].equals("reload")) {
             if (!sender.isOp()) {//TODO Permission
-                sender.sendMessage("No perm");
+                sender.sendMessage(tl("no_perm"));
                 return true;
             }
             plugin.reload();
-            sender.sendMessage("Config reloaded!");
+            sender.sendMessage(tl("reloaded"));
             return true;
             }
         if (args[0].equals("list")) {
             if (!sender.isOp()) {//TODO Permission
-                sender.sendMessage("No perm");
+                sender.sendMessage(tl("no_perm"));
                 return true;
             }
             sendTransportList((Player) sender);
             return true;
+        }
+        if (args[0].equals("skip")) {
+            if (!sender.hasPermission("transwarp.skip")) {
+                sender.sendMessage(tl("no_perm"));
+                return true;
+            }
+            if (!TransWarp.isInTransport((Player) sender)) {
+                sender.sendMessage("Вы не в транспорте");
+                return true;
+            }
+            TransWarp.getTransport((Player) sender).cancelTransporting();
         }
         return true;
     }

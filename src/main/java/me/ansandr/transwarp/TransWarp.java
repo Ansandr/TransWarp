@@ -53,6 +53,7 @@ public final class TransWarp extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
 
         saveDefaultConfig();
         settings = new Settings(this);
@@ -69,7 +70,6 @@ public final class TransWarp extends JavaPlugin {
         getCommand("settransport").setExecutor(setTransport);
         getCommand("settransport").setTabCompleter(setTransport);
         getCommand("transwarp").setExecutor(new CommandTranswarp(this));
-        instance = this;
     }
 
     public void reload() {

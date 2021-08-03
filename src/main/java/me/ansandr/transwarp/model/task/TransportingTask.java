@@ -1,22 +1,24 @@
-package me.ansandr.transwarp.task;
+package me.ansandr.transwarp.model.task;
 
+import me.ansandr.transwarp.model.Transport;
 import me.ansandr.transwarp.util.StringUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.NumberConversions;
 
 import static me.ansandr.transwarp.util.MessageManager.tl;
 
-public class TrasportingTask extends BukkitRunnable {
+public class TransportingTask extends BukkitRunnable {
 
+    private Transport transport;
     private Player player;
-    private Location targetLoc;
     private int delay;
 
-    public TrasportingTask(Player player, Location targetLoc, int delay) {
-        this.player = player;
-        this.targetLoc = targetLoc;
-        this.delay = delay;
+    public TransportingTask(Transport transport) {
+        this.transport = transport;
+        this.delay = NumberConversions.toInt(transport.getTime());
+        this.player = transport.getPassenger();
     }
 
     @Override
@@ -36,7 +38,7 @@ public class TrasportingTask extends BukkitRunnable {
     }
 
     private void end() {//Тп на варв
-        player.teleport(targetLoc);
+        player.teleport(transport.getTargetLocation());
         player.sendTitle(tl("got_title"), tl("got_subtitle"), 10, 300, 30);
         player.sendMessage(tl("you_got"));
     }

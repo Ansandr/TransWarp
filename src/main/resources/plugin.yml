@@ -2,8 +2,8 @@ name: TransWarp
 version: ${project.version}
 main: me.ansandr.transwarp.TransWarp
 api-version: 1.13
-depend: [ Essentials]
-softdepend: [ Vault, EssentialsSpawn ]
+depend: [ Essentials ]
+softdepend: [ Vault, EssentialsSpawn, GPS ]
 authors: [ Ansandr ]
 description: Introduces a transport system for realystic and quickly adventure around the world
 
@@ -16,6 +16,7 @@ commands:
   transport:
     description: Приехать на транспорте
   transwarp:
+    usage: /<command> <args...>
     description: Главная комманда
 permissions:
   transwarp.bypass:
@@ -23,3 +24,7 @@ permissions:
     default: false
   transwarp.fast:
     description: Поволяет игроку выбирать моментальную телепортироватацию на точку
+    default: op
+  transwarp.skip:
+    description: Доступ к комманде /transwarp skip
+    default: op

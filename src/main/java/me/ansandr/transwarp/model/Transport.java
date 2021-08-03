@@ -1,17 +1,22 @@
 package me.ansandr.transwarp.model;
 
+import me.ansandr.transwarp.TransWarp;
+import me.ansandr.transwarp.model.task.TransportingTask;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.NumberConversions;
 
-// Объект искуственного транспорта (машина, автобус, самолет)
+// Объект искусственного транспорта (машина, автобус, самолет)
 public class Transport {
 
     private TransportType type;
-    private Player passenger;//Nullable
-    private Location startLoc;//TODO commit
+    private Player passenger;
+    private TransportingTask task;
+    private Location startLoc;
     private Location transLoc;
     private Location targetLoc;
-    /** distance to target in blocks*/
+    /** distance from start to target in blocks*/
     private double distance;
     private double time;
     private double cost;
@@ -25,6 +30,7 @@ public class Transport {
         this.distance = distance;
         this.time = calculateTime();
         this.cost = calculateCost();
+        this.task = new TransportingTask(this);
     }
 
     /**
@@ -42,12 +48,33 @@ public class Transport {
         return type.getPrice() * (distance/1000);
     }
 
+    public void setPassenger(Player player) {
+        this.passenger = player;
+    }
+
     public Player getPassenger() {
         return passenger;
     }
 
-    public void setPassenger(Player player) {
-        this.passenger = player;
+    public void setTask(BukkitRunnable task) {
+        this.task = (TransportingTask) task;
+    }
+
+    public TransportingTask getTask() {
+        return task;
+    }
+
+    public void transport(TransWarp plugin) {
+        passenger.teleport(transLoc);
+        task.runTaskTimer(plugin, 20, 20);
+    }
+
+    public void teleportToTarget() {
+        passenger.teleport(targetLoc);
+    }
+
+    public void cancelTransporting() {
+        task.cancel();
     }
 
     /**
@@ -71,6 +98,9 @@ public class Transport {
         return targetLoc;
     }
 
+    /**
+     * @return Return a object of transport type
+     */
     public TransportType getType() {
         return type;
     }

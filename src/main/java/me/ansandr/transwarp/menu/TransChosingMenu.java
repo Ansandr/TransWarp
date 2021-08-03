@@ -45,18 +45,18 @@ public class TransChosingMenu extends Menu {
             }
             case ENDER_EYE: {
                 if (p.hasPermission("transwarp.fast")) {
-                    p.teleport(transport.getTargetLoc());
+                    transport.teleportToTarget();
                 }
                 break;
             }
             case COMPASS: {
-                if (plugin.getGPS() != null) {
-                    plugin.getGPSHook().launchCompass(p, transport.getTargetLoc());
+                if (plugin.getGPSHook().getApi() != null) {
+                    plugin.getGPSHook().launchCompass(p, transport.getTargetLocation());
                 }
                 break;
             }
             case CHEST_MINECART: {
-                TransportUtils.transport(transport, plugin);
+                transport.transport(plugin);
                 break;
             }
         }

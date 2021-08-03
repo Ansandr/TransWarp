@@ -4,6 +4,7 @@ import com.earth2me.essentials.commands.WarpNotFoundException;
 import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.menu.TransChosingMenu;
 import me.ansandr.transwarp.model.Transport;
+import me.ansandr.transwarp.model.task.TransportingTask;
 import me.ansandr.transwarp.util.TransportNotFoundException;
 import me.ansandr.transwarp.util.TransportUtils;
 import me.ansandr.util.menu.Menu;
@@ -21,6 +22,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerListener implements Listener {
 
@@ -59,7 +64,7 @@ public class PlayerListener implements Listener {
             p.sendMessage(ex.getMessage());
             return;
         }
-        doTransport(p, warpLoc);
+        doTransport(p, warpLoc, warpName);//TODO
     }
 
     @EventHandler
@@ -70,7 +75,7 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location homeLoc = e.getHomeLocation();
-        doTransport(p, homeLoc);
+        doTransport(p, homeLoc, "home");//TODO
     }
 
     @EventHandler
@@ -81,10 +86,10 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location spawnLoc = e.getSpawnLocation();
-        doTransport(p, spawnLoc);
+        doTransport(p, spawnLoc, "Spawn");//TODO
     }
 
-    private void doTransport(Player player, Location targetLoc) {
+    private void doTransport(Player player, Location targetLoc, String targetName) {
         Transport transport = null;
         try {
             transport = TransportUtils.getTransport(player, targetLoc);
@@ -98,9 +103,10 @@ public class PlayerListener implements Listener {
         TransWarp.putTransport(player, transport);
         if (plugin.getSettings().isMenuEnable()) {
             TransWarp.createHolder(player);
-            new TransChosingMenu(TransWarp.getHolder(player), cost, "Spawn", plugin);//TODO
+            new TransChosingMenu(TransWarp.getHolder(player), cost, targetName, plugin);
         }
-        TransportUtils.transport(transport, plugin);
+        sendPotionEffect(player, plugin);
+        transport.transport(plugin);
     }
 
     @EventHandler
@@ -117,7 +123,6 @@ public class PlayerListener implements Listener {
         }
     }
 
-
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
         if (e.getMessage().equals("transwarp")) {
@@ -126,5 +131,15 @@ public class PlayerListener implements Listener {
                 p.sendMessage("Made by Ansandr");
             }
         }
+    }
+
+    private static void sendPotionEffect(Player p, Plugin plugin) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                p.addPotionEffect(
+                        new PotionEffect(PotionEffectType.SLOW, 80, 2, false, false));
+            }
+        }.runTaskLater(plugin, 5);
     }
 }
