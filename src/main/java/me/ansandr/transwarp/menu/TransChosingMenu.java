@@ -10,18 +10,30 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class TransChosingMenu extends Menu {
 
     private final TransWarp plugin;
 
+    @NotNull
     private Transport transport;
+
     private String name;
     private double cost;
 
-    public TransChosingMenu(InventoryHolder holder, double cost, String targetName, TransWarp plugin) {
+    public TransChosingMenu(InventoryHolder holder, Transport transport, String targetName, TransWarp plugin) {
         super((MenuHolder) holder);
-        this.cost = cost;
+        this.transport = transport;
+        this.cost = transport.getCost();
+        this.name = targetName;
+        this.plugin = plugin;
+    }
+
+    public TransChosingMenu(Player viewer, Transport transport, String targetName, TransWarp plugin) {
+        super(viewer);
+        this.transport = transport;
+        this.cost = transport.getCost();
         this.name = targetName;
         this.plugin = plugin;
     }
@@ -63,8 +75,7 @@ public class TransChosingMenu extends Menu {
     }
 
     @Override
-    public void setMenuItems(Player player) {
-
+    public void createMenuItems(Player player) {
         ItemStack fast;
 
         if (player.hasPermission("transwarp.fast")) {
@@ -77,9 +88,9 @@ public class TransChosingMenu extends Menu {
 
         ItemStack transport = createItemStack(Material.CHEST_MINECART, "Трансопрт",("Цена поезди " + cost),"Нажмите, чтобы приехать на автобусе");//TODO локализация
 
-        setItem(10, fast);
-        setItem(12, gps);
-        setItem(14, transport);
+        addItem(11, fast);
+        addItem(13, gps);
+        addItem(15, transport);
     }
 
     @Override

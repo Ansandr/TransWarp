@@ -8,6 +8,7 @@ import me.ansandr.transwarp.model.task.TransportingTask;
 import me.ansandr.transwarp.util.TransportNotFoundException;
 import me.ansandr.transwarp.util.TransportUtils;
 import me.ansandr.util.menu.Menu;
+import me.ansandr.util.menu.MenuHolder;
 import net.ess3.api.IEssentials;
 import net.ess3.api.InvalidWorldException;
 import net.ess3.api.events.UserTeleportHomeEvent;
@@ -98,15 +99,16 @@ public class PlayerListener implements Listener {
             return;
         }
 
-        double cost = transport.getCost();
-
         TransWarp.putTransport(player, transport);
         if (plugin.getSettings().isMenuEnable()) {
-            TransWarp.createHolder(player);
-            new TransChosingMenu(TransWarp.getHolder(player), cost, targetName, plugin);
+            MenuHolder holder = TransWarp.createHolder(player);
+            TransChosingMenu menu = new TransChosingMenu(holder, transport, targetName, plugin);
+            menu.createMenuItems(player);
+            menu.open();
+            return;
         }
-        sendPotionEffect(player, plugin);
         transport.transport(plugin);
+
     }
 
     @EventHandler
@@ -115,10 +117,11 @@ public class PlayerListener implements Listener {
 
         InventoryHolder holder = e.getClickedInventory().getHolder();
         if (holder == plugin.getHolder(p)) {
+            e.setCancelled(true);
             if (e.getCurrentItem() == null)
                 return;
             // Choose menu
-            Menu menu = plugin.getMenuHolders().get(p).getMenu();
+            Menu menu = plugin.getHolder(p).getMenu();
             menu.handleMenu(e);
         }
     }
@@ -131,15 +134,5 @@ public class PlayerListener implements Listener {
                 p.sendMessage("Made by Ansandr");
             }
         }
-    }
-
-    private static void sendPotionEffect(Player p, Plugin plugin) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                p.addPotionEffect(
-                        new PotionEffect(PotionEffectType.SLOW, 80, 2, false, false));
-            }
-        }.runTaskLater(plugin, 5);
     }
 }

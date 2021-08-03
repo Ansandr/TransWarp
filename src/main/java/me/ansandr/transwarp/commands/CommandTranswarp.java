@@ -2,15 +2,17 @@ package me.ansandr.transwarp.commands;
 
 import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.TransportTypeManager;
-import me.ansandr.transwarp.model.Transport;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import static com.earth2me.essentials.I18n.tl;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CommandTranswarp implements CommandExecutor {
+import static me.ansandr.transwarp.util.MessageManager.tl;
+
+public class CommandTranswarp implements TabExecutor {
 
     private final TransWarp plugin;
 
@@ -60,5 +62,20 @@ public class CommandTranswarp implements CommandExecutor {
         for (String name : TransportTypeManager.typeMap.keySet()) {
             player.sendMessage(name); //TODO локализация json
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            List<String> tabs = new ArrayList<>();
+            if (sender.hasPermission("transwarp.skip")) {
+                tabs.add("skip");
+            }
+            if (sender.isOp()) {//TODO permission
+                tabs.add("reload");
+                tabs.add("list");
+            }
+        }
+        return new ArrayList<>();
     }
 }

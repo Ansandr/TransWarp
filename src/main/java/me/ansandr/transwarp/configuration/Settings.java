@@ -25,7 +25,7 @@ public class Settings {
         config = plugin.getConfig();
     }
 
-    public  void reloadConfig() {
+    public void reloadConfig() {
         plugin.reloadConfig();
 
         rawVersion = config.getDefaults().getString("config_version");
@@ -35,10 +35,8 @@ public class Settings {
             LOGGER.warning("Config is outdated!");//TODO update
         }
 
-
-
         storageType = config.getString("storage_type".toLowerCase(Locale.ROOT), "yaml");
-        isMenuEnable = config.getBoolean("menu.enable", false);
+        isMenuEnable = config.getBoolean("menu.enabled", false);
     }
 
     public String getStorageType() {

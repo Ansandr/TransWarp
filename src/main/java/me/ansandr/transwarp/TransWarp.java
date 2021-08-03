@@ -55,8 +55,9 @@ public final class TransWarp extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        saveDefaultConfig();
         settings = new Settings(this);
+        reload();
+
         messageManager = new MessageManager(this);
         messageManager.onEnable();
 
@@ -69,26 +70,29 @@ public final class TransWarp extends JavaPlugin {
         CommandSetTransport setTransport = new CommandSetTransport(this);
         getCommand("settransport").setExecutor(setTransport);
         getCommand("settransport").setTabCompleter(setTransport);
-        getCommand("transwarp").setExecutor(new CommandTranswarp(this));
+        CommandTranswarp transwarp = new CommandTranswarp(this);
+        getCommand("transwarp").setExecutor(transwarp);
+        getCommand("transwarp").setTabCompleter(transwarp);
     }
 
     public void reload() {
+        saveDefaultConfig();
+        config = getConfig();
+        settings.reloadConfig();
+        loadStorageType();
+        loadTransportTypes();
+    }
+
+    public void loadStorageType() {
         if (getSettings().getStorageType().equals("yaml")) {
             StorageConfig storageConfig = new StorageConfig(this);
             storage = new YamlStorageManager(storageConfig);
         } else if (getSettings().getStorageType().equals("sql")) {
             storage = new SQLStorageManager();//TODO
         }
-
-        loadTransportType();
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
-
-    private void loadTransportType() {
+    public void loadTransportTypes() {
         ConfigurationSection transports = config.getConfigurationSection("transports");
         Map<String, TransportType> typeMap = new HashMap<>();
         for (String key : transports.getKeys(false)) {//TODO Может быть null
@@ -149,16 +153,24 @@ public final class TransWarp extends JavaPlugin {
         transports.remove(player);
     }
 
-    public static void createHolder(Player player) {
+    /**
+     * Создать holder и поместить его в список
+     */
+    public static MenuHolder createHolder(Player player) {
         MenuHolder holder = new MenuHolder(player);
-        menuHolders.put(player, holder);
+        putHolder(holder);
+        return holder;
+    }
+
+    /**
+     * вставить holder в список
+     */
+    public static void putHolder(MenuHolder holder) {
+        menuHolders.put(holder.getViewer(), holder);
     }
 
     public static MenuHolder getHolder(Player player) {
-        if (menuHolders.containsKey(player)) {
-            return menuHolders.get(player);
-        }
-        return null;
+        return menuHolders.get(player);
     }
 
     public static Map<Player, MenuHolder> getMenuHolders() {

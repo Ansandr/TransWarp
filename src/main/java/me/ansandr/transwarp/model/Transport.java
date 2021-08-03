@@ -4,6 +4,9 @@ import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.model.task.TransportingTask;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.NumberConversions;
 
@@ -65,6 +68,7 @@ public class Transport {
     }
 
     public void transport(TransWarp plugin) {
+        sendPotionEffect(passenger, plugin);
         passenger.teleport(transLoc);
         task.runTaskTimer(plugin, 20, 20);
     }
@@ -115,5 +119,15 @@ public class Transport {
 
     public double getCost() {
         return cost;
+    }
+
+    private static void sendPotionEffect(Player p, Plugin plugin) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                p.addPotionEffect(
+                        new PotionEffect(PotionEffectType.SLOW, 80, 2, false, false));
+            }
+        }.runTaskLater(plugin, 5);
     }
 }
