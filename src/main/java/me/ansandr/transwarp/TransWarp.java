@@ -133,6 +133,22 @@ public final class TransWarp extends JavaPlugin {
         return settings;
     }
 
+    public static boolean isInTransport(Player player) {
+        return transports.containsKey(player);
+    }
+
+    public static void putTransport(Player player, Transport transport) {
+        transports.put(player, transport);
+    }
+
+    public static Transport getTransport(Player player) {
+        return transports.get(player);
+    }
+
+    public static void removeTransport(Player player) {
+        transports.remove(player);
+    }
+
     public static void createHolder(Player player) {
         MenuHolder holder = new MenuHolder(player);
         menuHolders.put(player, holder);
@@ -148,7 +164,6 @@ public final class TransWarp extends JavaPlugin {
     public static Map<Player, MenuHolder> getMenuHolders() {
         return menuHolders;
     }
-
 
     public TransportTypeManager getTypeManager() {
         return typeManager;
@@ -168,10 +183,6 @@ public final class TransWarp extends JavaPlugin {
 
     public GPSHook getGPSHook() {
         return gpsHook;
-    }
-
-    public GPSAPI getGPS() {
-        return gpsHook.getApi();
     }
 
     public static TransWarp getInstance() {

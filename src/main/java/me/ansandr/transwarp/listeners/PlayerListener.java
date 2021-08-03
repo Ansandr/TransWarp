@@ -36,7 +36,11 @@ public class PlayerListener implements Listener {
 
     @EventHandler//TODO commit
     public void onLeft(PlayerQuitEvent e) {
-
+        Player p = e.getPlayer();
+        if (TransWarp.isInTransport(p)) {
+            p.teleport(TransWarp.getTransport(e.getPlayer()).getStartLocation());
+            TransWarp.removeTransport(p);
+        }
     }
 
     // When player use warp
@@ -48,22 +52,14 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         String warpName = e.getWarp();
-        Location warpLoc = ess.getWarps().getWarp(warpName);
-        Transport transport = null;
+        Location warpLoc;
         try {
-            transport = TransportUtils.getTransport(p.getLocation(), warpLoc);
-        } catch (TransportNotFoundException ex) {
+            warpLoc = ess.getWarps().getWarp(warpName);
+        } catch (WarpNotFoundException ex) {
             p.sendMessage(ex.getMessage());
             return;
         }
-        transport.setPassenger(p);
-        double cost = transport.getCost();
-
-        if (plugin.getSettings().isMenuEnable()) {
-            TransWarp.createHolder(p);
-            new TransChosingMenu(TransWarp.getHolder(p), cost, warpName, plugin);
-        }
-        TransportUtils.transport(transport, plugin);
+        doTransport(p, warpLoc);
     }
 
     @EventHandler
@@ -74,21 +70,7 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location homeLoc = e.getHomeLocation();
-        Transport transport = null;
-        try {
-            transport = TransportUtils.getTransport(p.getLocation(), homeLoc);
-        } catch (TransportNotFoundException ex) {
-            p.sendMessage(ex.getMessage());
-            return;
-        }
-        transport.setPassenger(p);
-        double cost = transport.getCost();
-
-        if (plugin.getSettings().isMenuEnable()) {
-            TransWarp.createHolder(p);
-            new TransChosingMenu(TransWarp.getHolder(p), cost, e.getHomeName(), plugin);
-        }
-        TransportUtils.transport(transport, plugin);
+        doTransport(p, homeLoc);
     }
 
     @EventHandler
@@ -99,19 +81,24 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location spawnLoc = e.getSpawnLocation();
+        doTransport(p, spawnLoc);
+    }
+
+    private void doTransport(Player player, Location targetLoc) {
         Transport transport = null;
         try {
-            transport = TransportUtils.getTransport(p.getLocation(), spawnLoc);
+            transport = TransportUtils.getTransport(player, targetLoc);
         } catch (TransportNotFoundException ex) {
-            p.sendMessage(ex.getMessage());
+            player.sendMessage(ex.getMessage());
             return;
         }
-        transport.setPassenger(p);
+
         double cost = transport.getCost();
 
+        TransWarp.putTransport(player, transport);
         if (plugin.getSettings().isMenuEnable()) {
-            TransWarp.createHolder(p);
-            new TransChosingMenu(TransWarp.getHolder(p), cost, "Spawn", plugin);//TODO
+            TransWarp.createHolder(player);
+            new TransChosingMenu(TransWarp.getHolder(player), cost, "Spawn", plugin);//TODO
         }
         TransportUtils.transport(transport, plugin);
     }

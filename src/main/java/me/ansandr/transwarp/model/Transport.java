@@ -17,19 +17,11 @@ public class Transport {
     private double cost;
 
     public Transport(TransportType type, Player passenger, Location transLoc, Location targetLoc, double distance) {
-        this.transLoc = transLoc;
-        this.targetLoc = targetLoc;
         this.type = type;
         this.passenger = passenger;
-        this.distance = distance;
-        this.time = calculateTime();
-        this.cost = calculateCost();
-    }
-
-    public Transport(TransportType type, Location transLoc, Location targetLoc, double distance) {
+        this.startLoc = passenger.getLocation();
         this.transLoc = transLoc;
         this.targetLoc = targetLoc;
-        this.type = type;
         this.distance = distance;
         this.time = calculateTime();
         this.cost = calculateCost();
@@ -58,11 +50,24 @@ public class Transport {
         this.passenger = player;
     }
 
+    /**
+     * @return Location where player has been before teleported to transport
+     */
+    public Location getStartLocation() {
+        return startLoc;
+    }
+
+    /**
+     * @return The transport location
+     */
     public Location getTransLocation() {
         return transLoc;
     }
 
-    public Location getTargetLoc() {
+    /**
+     * @return A location where player will be teleported after transport
+     */
+    public Location getTargetLocation() {
         return targetLoc;
     }
 
