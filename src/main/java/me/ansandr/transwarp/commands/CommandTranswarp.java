@@ -1,9 +1,11 @@
 package me.ansandr.transwarp.commands;
 
 import me.ansandr.transwarp.TransWarp;
+import me.ansandr.transwarp.TransportTypeManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class CommandTranswarp implements CommandExecutor {
 
@@ -33,9 +35,16 @@ public class CommandTranswarp implements CommandExecutor {
                 sender.sendMessage("No perm");
                 return true;
             }
-            //TODO show list method
+            sendTransportList((Player) sender);
             return true;
         }
         return true;
+    }
+
+    private void sendTransportList(Player player) {
+        player.sendMessage("Available transports:");
+        for (String name : TransportTypeManager.typeMap.keySet()) {
+            player.sendMessage(name); //TODO локализация json
+        }
     }
 }
