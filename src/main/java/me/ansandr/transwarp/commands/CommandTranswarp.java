@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.ansandr.transwarp.util.MessageManager.tl;
+import static me.ansandr.utils.message.MessageManager.tl;
 
 public class CommandTranswarp implements TabExecutor {
 
@@ -23,21 +23,21 @@ public class CommandTranswarp implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage("Incorrect usage");
+            sender.sendMessage(tl("common.invalid_usage"));
             return false;
         }
         if (args[0].equals("reload")) {
-            if (!sender.isOp()) {//TODO Permission
-                sender.sendMessage(tl("no_perm"));
+            if (!sender.isOp()) {
+                sender.sendMessage(tl("common.no_permissions"));
                 return true;
             }
             plugin.reload();
-            sender.sendMessage(tl("reloaded"));
+            sender.sendMessage(tl("common.reloaded"));
             return true;
             }
         if (args[0].equals("list")) {
-            if (!sender.isOp()) {//TODO Permission
-                sender.sendMessage(tl("no_perm"));
+            if (!sender.isOp()) {
+                sender.sendMessage(tl("common.no_permissions"));
                 return true;
             }
             sendTransportList((Player) sender);
@@ -45,7 +45,7 @@ public class CommandTranswarp implements TabExecutor {
         }
         if (args[0].equals("skip")) {
             if (!sender.hasPermission("transwarp.skip")) {
-                sender.sendMessage(tl("no_perm"));
+                sender.sendMessage(tl("common.no_permissions"));
                 return true;
             }
             if (!TransWarp.isInTransport((Player) sender)) {
@@ -71,7 +71,7 @@ public class CommandTranswarp implements TabExecutor {
             if (sender.hasPermission("transwarp.skip")) {
                 tabs.add("skip");
             }
-            if (sender.isOp()) {//TODO permission
+            if (sender.isOp()) {
                 tabs.add("reload");
                 tabs.add("list");
             }

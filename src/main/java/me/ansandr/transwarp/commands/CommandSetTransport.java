@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static me.ansandr.transwarp.util.MessageManager.tl;
+import static me.ansandr.utils.message.MessageManager.tl;
 
 public class CommandSetTransport implements TabExecutor {
 
@@ -23,32 +23,30 @@ public class CommandSetTransport implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Only for player");
+            sender.sendMessage(tl("common.for_player"));
             return false;
         }
         Player p = (Player) sender;
 
-        try {
-            if (p.isOp()) {
-                //settrans <transName> <transportType>
-                String transportName = args[0];
-                String transportType = args[1];
-
-                if (TransportTypeManager.isTypeExist(transportType)) {
-                    storage.setTransport(transportName, transportType, p.getLocation());
-                    p.sendMessage(tl("transport_set"));
-                } else {
-                    p.sendMessage(tl("transport_type_not_initialized"));
-                }
-
+        if (args.length == 2) {
+            //settrans <transName> <transportType>
+            if (!p.isOp()) {
+                p.sendMessage(tl("common.no_permissions"));
                 return true;
             }
-            p.sendMessage(tl("no_perm"));
+            String transportName = args[0];
+            String transportType = args[1];
 
-        } catch(IndexOutOfBoundsException ex) {
-            p.sendMessage("Incorrect usage");
-            //TODO sendHelp
+            if (TransportTypeManager.isTypeExist(transportType)) {
+                storage.setTransport(transportName, transportType, p.getLocation());
+                p.sendMessage(tl("command.transport_set"));
+            } else {
+                p.sendMessage(tl("error.transport_type_not_initialized"));
+            }
+            return true;
         }
+        //If invalid usage
+        sender.sendMessage(tl("common.invalid_usage"));
         return false;
     }
 

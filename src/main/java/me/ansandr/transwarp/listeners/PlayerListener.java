@@ -4,11 +4,10 @@ import com.earth2me.essentials.commands.WarpNotFoundException;
 import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.menu.TransChosingMenu;
 import me.ansandr.transwarp.model.Transport;
-import me.ansandr.transwarp.model.task.TransportingTask;
 import me.ansandr.transwarp.util.TransportNotFoundException;
 import me.ansandr.transwarp.util.TransportUtils;
-import me.ansandr.util.menu.Menu;
-import me.ansandr.util.menu.MenuHolder;
+import me.ansandr.utils.menu.Menu;
+import me.ansandr.utils.menu.MenuHolder;
 import net.ess3.api.IEssentials;
 import net.ess3.api.InvalidWorldException;
 import net.ess3.api.events.UserTeleportHomeEvent;
@@ -23,10 +22,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
+
+import static me.ansandr.utils.message.MessageManager.tl;
 
 public class PlayerListener implements Listener {
 
@@ -40,7 +37,7 @@ public class PlayerListener implements Listener {
         this.config = plugin.getConfig();
     }
 
-    @EventHandler//TODO commit
+    @EventHandler
     public void onLeft(PlayerQuitEvent e) {
         Player p = e.getPlayer();
         if (TransWarp.isInTransport(p)) {
@@ -65,7 +62,7 @@ public class PlayerListener implements Listener {
             p.sendMessage(ex.getMessage());
             return;
         }
-        doTransport(p, warpLoc, warpName);//TODO
+        doTransport(p, warpLoc, tl("transport_to_warp").replace("{warp}", warpName));
     }
 
     @EventHandler
@@ -76,7 +73,7 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location homeLoc = e.getHomeLocation();
-        doTransport(p, homeLoc, "home");//TODO
+        doTransport(p, homeLoc, tl("transport_to_home").replace("{home}", e.getHomeName()));
     }
 
     @EventHandler
@@ -87,10 +84,16 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location spawnLoc = e.getSpawnLocation();
-        doTransport(p, spawnLoc, "Spawn");//TODO
+        doTransport(p, spawnLoc, tl("transport_to_spawn").replace("{spawnGroup}", e.getSpawnGroup()));
     }
 
-    private void doTransport(Player player, Location targetLoc, String targetName) {
+    /**
+     *
+     * @param player
+     * @param targetLoc
+     * @param title for menu
+     */
+    private void doTransport(Player player, Location targetLoc, String title) {
         Transport transport = null;
         try {
             transport = TransportUtils.getTransport(player, targetLoc);
@@ -102,14 +105,21 @@ public class PlayerListener implements Listener {
         TransWarp.putTransport(player, transport);
         if (plugin.getSettings().isMenuEnable()) {
             MenuHolder holder = TransWarp.createHolder(player);
-            TransChosingMenu menu = new TransChosingMenu(holder, transport, targetName, plugin);
+            TransChosingMenu menu = new TransChosingMenu(holder, transport, title, plugin);
             menu.createMenuItems(player);
             menu.open();
             return;
         }
         transport.transport(plugin);
-
     }
+
+    /**
+     *
+     */
+    private void doTransport(Player player, Location targetLoc) {
+        doTransport(player, targetLoc, null);
+    }
+
 
     @EventHandler
     public void onMenuClick(InventoryClickEvent e) {

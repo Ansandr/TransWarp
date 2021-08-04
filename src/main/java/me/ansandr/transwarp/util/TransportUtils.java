@@ -2,16 +2,10 @@ package me.ansandr.transwarp.util;
 
 import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.model.Transport;
-import me.ansandr.transwarp.model.task.TransportingTask;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.NumberConversions;
 
-import static me.ansandr.transwarp.util.MessageManager.tl;
+import static me.ansandr.utils.message.MessageManager.tl;
 
 public class TransportUtils {
 
@@ -37,6 +31,10 @@ public class TransportUtils {
             throw new TransportNotFoundException("");
         }
         //Получить объект транспорта
+        if (TransWarp.getInstance().getSettings().costIsStatic()) {
+            return new Transport(finder.getTransportType(), player, transLoc, targetLoc,
+                    finder.distance, finder.getTransportType().getPrice());//TODO рефакторинг
+        }
         return new Transport(finder.getTransportType(), player, transLoc, targetLoc,
                 finder.distance);
     }

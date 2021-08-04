@@ -7,14 +7,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
+
+import static me.ansandr.utils.message.MessageManager.tl;
 
 public class TransportTypeManager {
+
+    public final Logger LOGGER;
 
     public static Map<String, TransportType> typeMap;
 
     public Map<String, TransportType> availableTypes;
 
     public TransportTypeManager(TransWarp plugin, Map<String, TransportType> typeMap) {
+        LOGGER = plugin.getLogger();
         TransportTypeManager.typeMap = typeMap;
         availableTypes = putSetToMap(plugin.getStorage().getTransportTypes());
     }
@@ -25,14 +31,17 @@ public class TransportTypeManager {
      * @return TransportType
      */
     public TransportType getByDistance(double distance) throws TransportNotFoundException {
-        if (availableTypes == null) throw new TransportNotFoundException();
+        if (availableTypes == null) {
+            LOGGER.warning("Transports is not configured in config");
+            throw new TransportNotFoundException();
+        }
         for(TransportType type : availableTypes.values()) {
             //minDistance <= distance <= maxDistance
             if (type.getMinDistance() >= distance) {
-                throw new TransportNotFoundException("too close");//TODO локализация
+                throw new TransportNotFoundException(tl("error.transport_too_close"));
             }
             if  (distance >= type.getMaxDistance()) {
-                throw new TransportNotFoundException("too far");//TODO локализация
+                throw new TransportNotFoundException(tl("error.transport_too_far"));
             }
             return type;
         }

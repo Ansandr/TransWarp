@@ -10,13 +10,15 @@ import org.bukkit.util.NumberConversions;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Класс для поиска оптимального транспорта
 */
 public class TransportFinder {
 
-    private final TransWarp plugin;//TODO может сделать статик?
+    private static Logger LOGGER = TransWarp.getInstance().getLogger();
+    private final TransWarp plugin;//TODO Рефакторинг
 
     private FileConfiguration config;
     private StorageManager storage;
@@ -39,12 +41,13 @@ public class TransportFinder {
         //Выбрать тип транспорта исходя из длины
         type = plugin.getTypeManager().getByDistance(distance);
         if (type == null) {
-            throw new TransportNotFoundException();//TODO локализация
+            throw new TransportNotFoundException();
         }
         //Собрать все транспорта одного типа
         Set<String> transportSet = storage.getTransports(type.getName());
         if (transportSet == null) {
-            throw new TransportNotFoundException();//TODO локализация
+            LOGGER.warning(String.format("Transport of type %s not found", type.getName()));
+            throw new TransportNotFoundException();
         }
         //Выбрать случайный транспорт из списка
         String transportName = getRandom(transportSet);

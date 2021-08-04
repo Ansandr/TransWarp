@@ -2,12 +2,11 @@ package me.ansandr.transwarp.model.task;
 
 import me.ansandr.transwarp.model.Transport;
 import me.ansandr.transwarp.util.StringUtil;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.NumberConversions;
 
-import static me.ansandr.transwarp.util.MessageManager.tl;
+import static me.ansandr.utils.message.MessageManager.tl;
 
 public class TransportingTask extends BukkitRunnable {
 

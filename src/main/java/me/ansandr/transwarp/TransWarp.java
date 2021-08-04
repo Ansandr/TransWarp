@@ -1,6 +1,5 @@
 package me.ansandr.transwarp;
 
-import com.live.bemmamin.gps.api.GPSAPI;
 import me.ansandr.transwarp.commands.CommandSetTransport;
 import me.ansandr.transwarp.commands.CommandTranswarp;
 import me.ansandr.transwarp.configuration.Settings;
@@ -14,8 +13,8 @@ import me.ansandr.transwarp.model.TransportType;
 import me.ansandr.transwarp.storage.SQLStorageManager;
 import me.ansandr.transwarp.storage.StorageManager;
 import me.ansandr.transwarp.storage.YamlStorageManager;
-import me.ansandr.transwarp.util.MessageManager;
-import me.ansandr.util.menu.MenuHolder;
+import me.ansandr.utils.message.MessageManager;
+import me.ansandr.utils.menu.MenuHolder;
 import net.ess3.api.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.configuration.Configuration;
@@ -58,8 +57,7 @@ public final class TransWarp extends JavaPlugin {
         settings = new Settings(this);
         reload();
 
-        messageManager = new MessageManager(this);
-        messageManager.onEnable();
+        messageManager = new MessageManager(this, (Configuration) config.getConfigurationSection("messages"));
 
         setupEssentials();
         setupVault();
@@ -95,7 +93,7 @@ public final class TransWarp extends JavaPlugin {
     public void loadTransportTypes() {
         ConfigurationSection transports = config.getConfigurationSection("transports");
         Map<String, TransportType> typeMap = new HashMap<>();
-        for (String key : transports.getKeys(false)) {//TODO Может быть null
+        for (String key : transports.getKeys(false)) {
             TransportType transportType = new TransportType(
                     key,
                     transports.getInt(key + ".max_distance"),

@@ -36,6 +36,18 @@ public class Transport {
         this.task = new TransportingTask(this);
     }
 
+    public Transport(TransportType type, Player passenger, Location transLoc, Location targetLoc, double distance, double cost) {
+        this.type = type;
+        this.passenger = passenger;
+        this.startLoc = passenger.getLocation();
+        this.transLoc = transLoc;
+        this.targetLoc = targetLoc;
+        this.distance = distance;
+        this.time = calculateTime();
+        this.cost = type.getPrice();
+        this.task = new TransportingTask(this);
+    }
+
     /**
      * Calculate time of seconds in how need for transport
      */

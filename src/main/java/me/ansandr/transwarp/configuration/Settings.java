@@ -18,6 +18,7 @@ public class Settings {
     public static int version;
 
     private String storageType;
+    private boolean costIsStatic;
     private boolean isMenuEnable;
 
     public Settings(final TransWarp plugin) {
@@ -36,11 +37,16 @@ public class Settings {
         }
 
         storageType = config.getString("storage_type".toLowerCase(Locale.ROOT), "yaml");
+        costIsStatic = config.getBoolean("static_cost");
         isMenuEnable = config.getBoolean("menu.enabled", false);
     }
 
     public String getStorageType() {
         return storageType;
+    }
+
+    public boolean costIsStatic() {
+        return costIsStatic;
     }
 
     public boolean isMenuEnable() {

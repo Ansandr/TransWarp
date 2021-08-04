@@ -2,15 +2,17 @@ package me.ansandr.transwarp.menu;
 
 import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.model.Transport;
-import me.ansandr.transwarp.util.TransportUtils;
-import me.ansandr.util.menu.Menu;
-import me.ansandr.util.menu.MenuHolder;
+import me.ansandr.utils.menu.Menu;
+import me.ansandr.utils.menu.MenuHolder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import static me.ansandr.utils.message.MessageManager.tl;
+import static me.ansandr.utils.message.MessageManager.tla;
 
 public class TransChosingMenu extends Menu {
 
@@ -41,7 +43,7 @@ public class TransChosingMenu extends Menu {
     @Override
     public String getTitle() {
         return (name);
-    }//TODO локализация + имя варпа в название
+    }
 
     @Override
     public int getSize() {
@@ -79,14 +81,14 @@ public class TransChosingMenu extends Menu {
         ItemStack fast;
 
         if (player.hasPermission("transwarp.fast")) {
-            fast = createItemStack(Material.ENDER_EYE, "Быстрый телепорт");
+            fast = createItemStack(Material.ENDER_EYE, tl("menu.item_title.fast"), tl("menu.lore.fast"));
         } else {
-            fast = createItemStack(Material.BARRIER, "НЕДОСТУПНО", "","Купите донат, чтобы открыть возможность телепортации");//TODO локализация
+            fast = createItemStack(Material.BARRIER, tl("menu.item_title.fast_lock"), tl("menu.lore.fast_lock"));
         }
 
-        ItemStack gps = createItemStack(Material.COMPASS, "GPS", "","Нажмите, чтобы использовать навигатор");//TODO локализация
+        ItemStack gps = createItemStack(Material.COMPASS, tl("menu.item_title.gps"), tl("menu.lore.gps"));
 
-        ItemStack transport = createItemStack(Material.CHEST_MINECART, "Трансопрт",("Цена поезди " + cost),"Нажмите, чтобы приехать на автобусе");//TODO локализация
+        ItemStack transport = createItemStack(Material.CHEST_MINECART, tl("menu.item_title.transport"), format("menu.item_title.transport", cost));
 
         addItem(11, fast);
         addItem(13, gps);
@@ -96,5 +98,13 @@ public class TransChosingMenu extends Menu {
     @Override
     public ItemStack setFillerItem() {
         return null;
+    }
+
+    private static String[] format(String path, double cost) {
+        String[] array = tla("menu.item_title.transport");
+        for (int i = 0; i < array.length; i++) {
+            array[i] = array[i].replace("{cost}", String.valueOf(cost));
+        }
+        return array;
     }
 }
