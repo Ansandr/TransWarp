@@ -70,7 +70,13 @@ public class TransChosingMenu extends Menu {
                 break;
             }
             case CHEST_MINECART: {
-                transport.transport(plugin);
+                if (plugin.getVaultHook().getEconomy().withdrawPlayer(holder.getViewer(), cost).transactionSuccess()) {
+                    transport.transport(plugin);
+                    return;
+                }
+                //else
+                holder.getViewer().closeInventory();
+                holder.getViewer().sendMessage(tl("common.no_enough_money"));
                 break;
             }
         }
@@ -81,12 +87,12 @@ public class TransChosingMenu extends Menu {
         ItemStack fast;
 
         if (player.hasPermission("transwarp.fast")) {
-            fast = createItemStack(Material.ENDER_EYE, tl("menu.item_title.fast"), tl("menu.lore.fast"));
+            fast = createItemStack(Material.ENDER_EYE, tl("menu.item_title.fast"), tla("menu.lore.fast"));
         } else {
-            fast = createItemStack(Material.BARRIER, tl("menu.item_title.fast_lock"), tl("menu.lore.fast_lock"));
+            fast = createItemStack(Material.BARRIER, tl("menu.item_title.fast_lock"), tla("menu.lore.fast_lock"));
         }
 
-        ItemStack gps = createItemStack(Material.COMPASS, tl("menu.item_title.gps"), tl("menu.lore.gps"));
+        ItemStack gps = createItemStack(Material.COMPASS, tl("menu.item_title.gps"), tla("menu.lore.gps"));
 
         ItemStack transport = createItemStack(Material.CHEST_MINECART, tl("menu.item_title.transport"), format("menu.item_title.transport", cost));
 
@@ -101,7 +107,7 @@ public class TransChosingMenu extends Menu {
     }
 
     private static String[] format(String path, double cost) {
-        String[] array = tla("menu.item_title.transport");
+        String[] array = tla("menu.lore.transport");
         for (int i = 0; i < array.length; i++) {
             array[i] = array[i].replace("{cost}", String.valueOf(cost));
         }

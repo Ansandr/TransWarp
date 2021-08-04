@@ -62,7 +62,7 @@ public class PlayerListener implements Listener {
             p.sendMessage(ex.getMessage());
             return;
         }
-        doTransport(p, warpLoc, tl("transport_to_warp").replace("{warp}", warpName));
+        doTransport(p, warpLoc, tl("transport.transport_to_warp").replace("{warp}", warpName));
     }
 
     @EventHandler
@@ -73,7 +73,7 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location homeLoc = e.getHomeLocation();
-        doTransport(p, homeLoc, tl("transport_to_home").replace("{home}", e.getHomeName()));
+        doTransport(p, homeLoc, tl("transport.transport_to_home").replace("{home}", e.getHomeName()));
     }
 
     @EventHandler
@@ -84,7 +84,7 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location spawnLoc = e.getSpawnLocation();
-        doTransport(p, spawnLoc, tl("transport_to_spawn").replace("{spawnGroup}", e.getSpawnGroup()));
+        doTransport(p, spawnLoc, tl("transport.transport_to_spawn").replace("{spawnGroup}", e.getSpawnGroup()));
     }
 
     /**
@@ -110,6 +110,10 @@ public class PlayerListener implements Listener {
             menu.open();
             return;
         }
+        if (player.hasPermission("transwarp.fast")) {
+            transport.teleportToTarget();
+            return;
+        }
         transport.transport(plugin);
     }
 
@@ -128,6 +132,8 @@ public class PlayerListener implements Listener {
         InventoryHolder holder = e.getClickedInventory().getHolder();
         if (holder == plugin.getHolder(p)) {
             e.setCancelled(true);
+            if (e.getClickedInventory() == null)
+                return;
             if (e.getCurrentItem() == null)
                 return;
             // Choose menu

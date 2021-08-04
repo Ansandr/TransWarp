@@ -4,7 +4,6 @@ import me.ansandr.transwarp.model.TransportType;
 import me.ansandr.transwarp.util.TransportNotFoundException;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -15,13 +14,13 @@ public class TransportTypeManager {
 
     public final Logger LOGGER;
 
-    public static Map<String, TransportType> typeMap;
+    public Map<String, TransportType> typeMap;
 
     public Map<String, TransportType> availableTypes;
 
     public TransportTypeManager(TransWarp plugin, Map<String, TransportType> typeMap) {
         LOGGER = plugin.getLogger();
-        TransportTypeManager.typeMap = typeMap;
+        this.typeMap = typeMap;
         availableTypes = putSetToMap(plugin.getStorage().getTransportTypes());
     }
 
@@ -56,11 +55,15 @@ public class TransportTypeManager {
         return map;
     }
 
+    public Map<String, TransportType> getTypeMap() {
+        return this.typeMap;
+    }
+
     /**
      * Возвращает, задан ли данный вид транспорта в конфиге
      * @param transportTypeName
      */
-    public static boolean isTypeExist(String transportTypeName) {
+    public boolean isTypeExist(String transportTypeName) {
         return typeMap.containsKey(transportTypeName);
     }
 }

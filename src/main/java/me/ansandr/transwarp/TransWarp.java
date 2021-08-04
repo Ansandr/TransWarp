@@ -13,8 +13,8 @@ import me.ansandr.transwarp.model.TransportType;
 import me.ansandr.transwarp.storage.SQLStorageManager;
 import me.ansandr.transwarp.storage.StorageManager;
 import me.ansandr.transwarp.storage.YamlStorageManager;
-import me.ansandr.utils.message.MessageManager;
 import me.ansandr.utils.menu.MenuHolder;
+import me.ansandr.utils.message.MessageManager;
 import net.ess3.api.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.configuration.Configuration;
@@ -23,7 +23,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -57,7 +58,7 @@ public final class TransWarp extends JavaPlugin {
         settings = new Settings(this);
         reload();
 
-        messageManager = new MessageManager(this, (Configuration) config.getConfigurationSection("messages"));
+        messageManager = new MessageManager(this, config.getConfigurationSection("messages"));//TODO проверить на отказоустойчивость
 
         setupEssentials();
         setupVault();
@@ -75,8 +76,8 @@ public final class TransWarp extends JavaPlugin {
 
     public void reload() {
         saveDefaultConfig();
-        config = getConfig();
         settings.reloadConfig();
+        config = getConfig();
         loadStorageType();
         loadTransportTypes();
     }
@@ -108,6 +109,9 @@ public final class TransWarp extends JavaPlugin {
 
     private boolean setupVault() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        if (!getSettings().isEconomyEnabled()) {
             return false;
         }
         vaultHook = new VaultHook();
@@ -189,6 +193,10 @@ public final class TransWarp extends JavaPlugin {
 
     public IEssentials getEssentials() {
         return essentialsHook.getEssentials();
+    }
+
+    public VaultHook getVaultHook() {
+        return this.vaultHook;
     }
 
     public GPSHook getGPSHook() {

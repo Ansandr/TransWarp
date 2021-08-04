@@ -41,6 +41,7 @@ messages:
     no_permissions: 'Нет прав'
     for_player: 'This command only for player'
     invalid_usage: 'Неверное использование'
+    no_enough_money: '&eНет денег'
   command:
     transport_set: 'Транспорт успешно установлен'
     help: |-
@@ -86,4 +87,4 @@ messages:
 
 
 # do not touch
-config_version: 1.0.0
+config_version: 1.0.2

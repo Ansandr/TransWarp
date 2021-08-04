@@ -53,29 +53,28 @@ public class CommandTranswarp implements TabExecutor {
                 return true;
             }
             TransWarp.getTransport((Player) sender).cancelTransporting();
+            TransWarp.getTransport((Player) sender).teleportToTarget();
         }
         return true;
     }
 
     private void sendTransportList(Player player) {
         player.sendMessage("Available transports:");
-        for (String name : TransportTypeManager.typeMap.keySet()) {
+        for (String name : plugin.getTypeManager().getTypeMap().keySet()) {
             player.sendMessage(name); //TODO локализация json
         }
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length == 1) {
-            List<String> tabs = new ArrayList<>();
-            if (sender.hasPermission("transwarp.skip")) {
-                tabs.add("skip");
-            }
-            if (sender.isOp()) {
-                tabs.add("reload");
-                tabs.add("list");
-            }
+        List<String> tabs = new ArrayList<>();
+        if (sender.hasPermission("transwarp.skip")) {
+            tabs.add("skip");
         }
-        return new ArrayList<>();
+        if (sender.isOp()) {
+            tabs.add("reload");
+            tabs.add("list");
+        }
+        return tabs;
     }
 }

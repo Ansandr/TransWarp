@@ -30,16 +30,16 @@ public class TransportingTask extends BukkitRunnable {
 
         String time = StringUtil.formatDuration(delay);
 
-        player.sendTitle(tl("time_left_title").replace("{time}", time)
-                , tl("time_left_subtitle").replace("{time}", time), 5, 20, 5);
+        player.sendTitle(tl("titles.time_left_title").replace("{time}", time)
+                , tl("titles.time_left_subtitle").replace("{time}", time), 5, 20, 5);
 
         delay--;
     }
 
     private void end() {//Тп на варв
         player.teleport(transport.getTargetLocation());
-        player.sendTitle(tl("got_title"), tl("got_subtitle"), 10, 300, 30);
-        player.sendMessage(tl("you_got"));
+        player.sendTitle(tl("titles.got_title"), tl("titles.got_subtitle"), 10, 300, 30);
+        player.sendMessage(tl("transport.you_got"));
     }
 
 

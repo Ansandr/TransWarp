@@ -15,9 +15,11 @@ import static me.ansandr.utils.message.MessageManager.tl;
 public class CommandSetTransport implements TabExecutor {
 
     private final StorageManager storage;
+    private final TransWarp plugin;
     private List<String> transportTypes;
     public CommandSetTransport(TransWarp plugin) {
         this.storage = plugin.getStorage();
+        this.plugin = plugin;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class CommandSetTransport implements TabExecutor {
             String transportName = args[0];
             String transportType = args[1];
 
-            if (TransportTypeManager.isTypeExist(transportType)) {
+            if (plugin.getTypeManager().isTypeExist(transportType)) {
                 storage.setTransport(transportName, transportType, p.getLocation());
                 p.sendMessage(tl("command.transport_set"));
             } else {
@@ -53,7 +55,7 @@ public class CommandSetTransport implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 2) {
-            return TransportTypeManager.typeMap.keySet().stream().toList();
+            return plugin.getTypeManager().getTypeMap().keySet().stream().toList();
         }
 
         return null;
