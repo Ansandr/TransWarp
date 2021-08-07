@@ -24,7 +24,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -58,8 +60,6 @@ public final class TransWarp extends JavaPlugin {
         settings = new Settings(this);
         reload();
 
-        messageManager = new MessageManager(this, config.getConfigurationSection("messages"));//TODO проверить на отказоустойчивость
-
         setupEssentials();
         setupVault();
         setupGPS();
@@ -78,11 +78,12 @@ public final class TransWarp extends JavaPlugin {
         saveDefaultConfig();
         settings.reloadConfig();
         config = getConfig();
-        loadStorageType();
+        loadStorage();
         loadTransportTypes();
+        messageManager = new MessageManager(this, config.getConfigurationSection("messages"));//TODO проверить на отказоустойчивость
     }
 
-    public void loadStorageType() {
+    public void loadStorage() {
         if (getSettings().getStorageType().equals("yaml")) {
             StorageConfig storageConfig = new StorageConfig(this);
             storage = new YamlStorageManager(storageConfig);
@@ -95,23 +96,39 @@ public final class TransWarp extends JavaPlugin {
         ConfigurationSection transports = config.getConfigurationSection("transports");
         Map<String, TransportType> typeMap = new HashMap<>();
         for (String key : transports.getKeys(false)) {
+            Set<String> transportSet = getStorage().getTransports(key);
+            if (transportSet == null) {
+                transportSet = new HashSet<>();
+            }
             TransportType transportType = new TransportType(
                     key,
                     transports.getInt(key + ".max_distance"),
                     transports.getInt(key + ".min_distance"),
                     transports.getDouble(key + ".speed"),
-                    transports.getDouble(key + ".cost")
+                    transports.getDouble(key + ".cost"),
+                    transportSet
             );
             typeMap.put(key, transportType);
         }
         typeManager = new TransportTypeManager(this, typeMap);
+        loadTeleporterType();
+    }
+
+    private void loadTeleporterType() {
+        ConfigurationSection teleporter = config.getConfigurationSection("teleporter");
+        TransportType type = new TransportType(
+                "teleporter",
+                teleporter.getInt("time"),
+                teleporter.getDouble("cost"),
+                getStorage().getTransports("teleporter")
+        );
+        typeManager.addType("teleporter", type);
     }
 
     private boolean setupVault() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
-        if (!getSettings().isEconomyEnabled()) {
+            LOGGER.info("Vault dependency not found!");
+            LOGGER.info("Economy module disabled");
             return false;
         }
         vaultHook = new VaultHook();
@@ -121,6 +138,8 @@ public final class TransWarp extends JavaPlugin {
 
     private boolean setupEssentials() {
         if (getServer().getPluginManager().getPlugin("Essentials") == null) {
+            LOGGER.warning("Essentials dependency not found!");
+            LOGGER.warning("Features cant working");
             return false;
         }
         essentialsHook = new EssentialsHook();
@@ -129,6 +148,7 @@ public final class TransWarp extends JavaPlugin {
 
     private boolean setupGPS() {
         if (getServer().getPluginManager().getPlugin("GPS") == null) {
+            LOGGER.info("GPS dependency not found!");
             return false;
         }
         gpsHook = new GPSHook(this);

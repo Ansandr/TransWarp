@@ -44,34 +44,22 @@ public class TransportFinder {
             throw new TransportNotFoundException();
         }
         //Собрать все транспорта одного типа
-        Set<String> transportSet = storage.getTransports(type.getName());
+        Set<String> transportSet = type.getTransports();
         if (transportSet == null) {
             LOGGER.warning(String.format("Transport of type %s not found", type.getName()));
             throw new TransportNotFoundException();
         }
         //Выбрать случайный транспорт из списка
-        String transportName = getRandom(transportSet);
+        String transportName = TransportUtils.getRandom(transportSet);
 
-        return storage.getLocation(type.getName() + "." + transportName);
+        return storage.getLocation(type.getName(), transportName);
     }
 
     public TransportType getTransportType() {
         return type;
     }
 
-    private String getRandom(Set<String> set) {
-        Random rand = new Random();
-
-        int index = rand.nextInt(set.size());//Случайное число от размера массива
-
-        Iterator<String> iter = set.iterator();
-        for (int i = 0; i < index; i++) {
-            iter.next();
-        }
-        return iter.next();
-    }
-
-    public double getDistanceSquared(Location firstLoc, Location secondLoc) {
+    public static double getDistanceSquared(Location firstLoc, Location secondLoc) {
         if (secondLoc == null) {
             throw new IllegalArgumentException("Cannot measure distance to a null location");
         } else if (secondLoc.getWorld() == null || firstLoc.getWorld() == null) {
@@ -95,7 +83,7 @@ public class TransportFinder {
      * @param secondLoc
      * @return расстояние по площади
      */
-    public double getDistance(Location firstLoc, Location secondLoc) {
+    public static double getDistance(Location firstLoc, Location secondLoc) {
         return Math.sqrt(getDistanceSquared(firstLoc, secondLoc));
     }
 }

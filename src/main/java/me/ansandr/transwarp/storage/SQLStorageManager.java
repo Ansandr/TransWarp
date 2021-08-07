@@ -21,12 +21,27 @@ public class SQLStorageManager implements StorageManager {
     }
 
     @Override
+    public Location getLocation(String transportType, String transportName) {
+        return null;
+    }
+
+    @Override
     public Set<String> getTransportTypes() {
         return null;
     }
 
     @Override
     public Set<String> getTransports(String transportType) {
+        return null;
+    }
+
+    @Override
+    public String getTransport(String transportType, String transportName) {
+        return null;
+    }
+
+    @Override
+    public String getTransport(String transportType) {
         return null;
     }
 }

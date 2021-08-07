@@ -1,5 +1,6 @@
 package me.ansandr.transwarp;
 
+import me.ansandr.transwarp.model.Transport;
 import me.ansandr.transwarp.model.TransportType;
 import me.ansandr.transwarp.util.TransportNotFoundException;
 
@@ -12,16 +13,14 @@ import static me.ansandr.utils.message.MessageManager.tl;
 
 public class TransportTypeManager {
 
-    public final Logger LOGGER;
+    private final TransWarp plugin;
+    private static Logger LOGGER = TransWarp.getInstance().getLogger();
 
     public Map<String, TransportType> typeMap;
 
-    public Map<String, TransportType> availableTypes;
-
     public TransportTypeManager(TransWarp plugin, Map<String, TransportType> typeMap) {
-        LOGGER = plugin.getLogger();
+        this.plugin = plugin;
         this.typeMap = typeMap;
-        availableTypes = putSetToMap(plugin.getStorage().getTransportTypes());
     }
 
     /**
@@ -30,11 +29,13 @@ public class TransportTypeManager {
      * @return TransportType
      */
     public TransportType getByDistance(double distance) throws TransportNotFoundException {
+        Map<String, TransportType> availableTypes = getAvailableTypes();
         if (availableTypes == null) {
             LOGGER.warning("Transports is not configured in config");
             throw new TransportNotFoundException();
         }
         for(TransportType type : availableTypes.values()) {
+            if (type.getMinDistance() == 0 && type.getMinDistance() == 0) continue;
             //minDistance <= distance <= maxDistance
             if (type.getMinDistance() >= distance) {
                 throw new TransportNotFoundException(tl("error.transport_too_close"));
@@ -47,9 +48,22 @@ public class TransportTypeManager {
         return null;
     }
 
-    private Map<String, TransportType> putSetToMap(Set<String> transportTypes) {
+    public TransportType getByName(String transportType) throws TransportNotFoundException {
+        Map<String, TransportType> availableTypes = getAvailableTypes();
+        if (availableTypes == null) {
+            LOGGER.warning("Transports is not configured in config");
+            throw new TransportNotFoundException();
+        }
+        return availableTypes.get(transportType);
+    }
+
+    public void addType(String name, TransportType type) {
+        typeMap.put(name, type);
+    }
+
+    private Map<String, TransportType> getAvailableTypes() {
         Map<String, TransportType> map = new HashMap<>();
-        for (String s : transportTypes) {
+        for (String s : plugin.getStorage().getTransportTypes()) {
             map.put(s, typeMap.get(s));//Имя машины, объект машины с таким именем
         }
         return map;

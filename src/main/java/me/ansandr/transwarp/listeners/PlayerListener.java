@@ -73,7 +73,9 @@ public class PlayerListener implements Listener {
         }
         e.setCancelled(true);
         Location homeLoc = e.getHomeLocation();
-        doTransport(p, homeLoc, tl("transport.transport_to_home").replace("{home}", e.getHomeName()));
+
+        String homeName = (e.getHomeName() == null) ? "" : e.getHomeName();
+        doTransport(p, homeLoc, tl("transport.transport_to_home").replace("{home}", homeName));
     }
 
     @EventHandler
@@ -95,14 +97,33 @@ public class PlayerListener implements Listener {
      */
     private void doTransport(Player player, Location targetLoc, String title) {
         Transport transport = null;
-        try {
-            transport = TransportUtils.getTransport(player, targetLoc);
-        } catch (TransportNotFoundException ex) {
-            player.sendMessage(ex.getMessage());
-            return;
+        if (targetLoc.getWorld() != player.getWorld()) {//WORLD_TELEPORTATOR
+            if (player.hasPermission("transwarp.bypass.world")) {
+                player.teleport(targetLoc);
+                return;
+            }
+
+            if (!plugin.getSettings().interWorldTransitEnabled()) {
+                player.sendMessage(tl("invalid_world"));//TODO локализация Различие между НЕКОРЕКТНЫМ МИРОМ и РАЗНЫМ МИРОМ
+                return;
+            }
+            try {
+                transport = TransportUtils.getTeleporter(player, targetLoc);
+            } catch (TransportNotFoundException ex) {
+                player.sendMessage(ex.getMessage());
+                return;
+            }
+        } else {//SIMPLE
+            try {
+                transport = TransportUtils.getTransport(player, targetLoc);
+            } catch (TransportNotFoundException ex) {
+                player.sendMessage(ex.getMessage());
+                return;
+            }
         }
 
         TransWarp.putTransport(player, transport);
+        //MENU
         if (plugin.getSettings().isMenuEnable()) {
             MenuHolder holder = TransWarp.createHolder(player);
             TransChosingMenu menu = new TransChosingMenu(holder, transport, title, plugin);
@@ -127,13 +148,14 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onMenuClick(InventoryClickEvent e) {
+        if (e.getClickedInventory() == null)
+            return;
         Player p = (Player) e.getWhoClicked();
 
         InventoryHolder holder = e.getClickedInventory().getHolder();
-        if (holder == plugin.getHolder(p)) {
+        if (holder instanceof MenuHolder) {
             e.setCancelled(true);
-            if (e.getClickedInventory() == null)
-                return;
+
             if (e.getCurrentItem() == null)
                 return;
             // Choose menu

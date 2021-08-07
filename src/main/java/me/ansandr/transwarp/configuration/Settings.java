@@ -23,6 +23,8 @@ public class Settings {
     private boolean isEconomyEnabled;
     private boolean costIsStatic;
     private boolean isMenuEnable;
+    //TODO private boolean isGpsEnable
+    private boolean interWorldTransitEnabled;
 
     public Settings(final TransWarp plugin) {
         this.plugin = plugin;
@@ -38,6 +40,7 @@ public class Settings {
             try {
                 ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"), new ArrayList<>());
                 config.set("config_version", rawVersion);
+                plugin.saveConfig();//TODO save with comment
                 LOGGER.info("Update successful");
             } catch (IOException ex) {
                 LOGGER.warning("Update failed");
@@ -49,9 +52,10 @@ public class Settings {
         config = plugin.getConfig();
 
         storageType = config.getString("storage_type".toLowerCase(Locale.ROOT), "yaml");
-        isEconomyEnabled = config.getBoolean("economy_enabled", false);
+        isEconomyEnabled = config.getBoolean("economy_enabled", false) && plugin.getEconomy() != null;
         costIsStatic = config.getBoolean("static_cost", true);
         isMenuEnable = config.getBoolean("menu.enabled", false);
+        interWorldTransitEnabled = config.getBoolean("inter_world_transit", true);
     }
 
     public String getStorageType() {
@@ -68,6 +72,10 @@ public class Settings {
 
     public boolean isMenuEnable() {
         return isMenuEnable;
+    }
+
+    public boolean interWorldTransitEnabled() {
+        return interWorldTransitEnabled;
     }
 
     public static int calculateVersion(String s) {

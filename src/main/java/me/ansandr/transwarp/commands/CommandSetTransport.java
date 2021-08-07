@@ -40,7 +40,7 @@ public class CommandSetTransport implements TabExecutor {
             String transportType = args[1];
 
             if (plugin.getTypeManager().isTypeExist(transportType)) {
-                storage.setTransport(transportName, transportType, p.getLocation());
+                storage.setTransport(transportType, transportName, p.getLocation());
                 p.sendMessage(tl("command.transport_set"));
             } else {
                 p.sendMessage(tl("error.transport_type_not_initialized"));

@@ -4,6 +4,7 @@ import me.ansandr.transwarp.TransWarp;
 import me.ansandr.transwarp.model.Transport;
 import me.ansandr.utils.menu.Menu;
 import me.ansandr.utils.menu.MenuHolder;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -66,17 +67,13 @@ public class TransChosingMenu extends Menu {
             case COMPASS: {
                 if (plugin.getGPSHook().getApi() != null) {
                     plugin.getGPSHook().launchCompass(p, transport.getTargetLocation());
+                    holder.getViewer().closeInventory();
                 }
                 break;
             }
             case CHEST_MINECART: {
-                if (plugin.getVaultHook().getEconomy().withdrawPlayer(holder.getViewer(), cost).transactionSuccess()) {
-                    transport.transport(plugin);
-                    return;
-                }
-                //else
                 holder.getViewer().closeInventory();
-                holder.getViewer().sendMessage(tl("common.no_enough_money"));
+                transport.transport(plugin);
                 break;
             }
         }
@@ -91,8 +88,12 @@ public class TransChosingMenu extends Menu {
         } else {
             fast = createItemStack(Material.BARRIER, tl("menu.item_title.fast_lock"), tla("menu.lore.fast_lock"));
         }
-
-        ItemStack gps = createItemStack(Material.COMPASS, tl("menu.item_title.gps"), tla("menu.lore.gps"));
+        ItemStack gps;
+        if (plugin.getGPSHook() != null) {
+            gps = createItemStack(Material.COMPASS, tl("menu.item_title.gps"), tla("menu.lore.gps"));
+        } else {
+            gps = null;//TODO предмет "пешком"
+        }
 
         ItemStack transport = createItemStack(Material.CHEST_MINECART, tl("menu.item_title.transport"), format("menu.item_title.transport", cost));
 

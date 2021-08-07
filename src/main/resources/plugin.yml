@@ -28,3 +28,9 @@ permissions:
   transwarp.skip:
     description: Доступ к комманде /transwarp skip
     default: op
+  transwarp.bypass.economy:
+    description: Позволяет игнорировать цены в транспортах
+    default: false
+  transwarp.bypass.world:
+    description: Позволяет игнорировать различие в мирах
+    default: false

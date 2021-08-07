@@ -29,11 +29,17 @@ transports:
     max_distance: 100000000
     min_distance: 1000
     speed: 800
+#Отдельный транспорт для перемещений между мирами
+teleporter:
+  # Сколько ждать телепортации (в секундах)
+  time: 100
+  cost: 5
+economy_enabled: true
 # Если активировано - цена за проезд у транспорта фиксированная и НЕ зависит от дальности
 static_cost: true
 menu:
   enabled: true
-
+inter_world_transit: true
 messages:
   common:
     prefix: '&a[&9Transwarp&a] &f'
@@ -87,4 +93,4 @@ messages:
 
 
 # do not touch
-config_version: 1.0.2
+config_version: 1.0.3

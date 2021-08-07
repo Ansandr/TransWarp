@@ -16,7 +16,7 @@ public class TransportingTask extends BukkitRunnable {
 
     public TransportingTask(Transport transport) {
         this.transport = transport;
-        this.delay = NumberConversions.toInt(transport.getTime());
+        this.delay = transport.getTime();
         this.player = transport.getPassenger();
     }
 
@@ -37,7 +37,7 @@ public class TransportingTask extends BukkitRunnable {
     }
 
     private void end() {//Тп на варв
-        player.teleport(transport.getTargetLocation());
+        transport.teleportToTarget();
         player.sendTitle(tl("titles.got_title"), tl("titles.got_subtitle"), 10, 300, 30);
         player.sendMessage(tl("transport.you_got"));
     }

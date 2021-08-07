@@ -6,7 +6,7 @@
 
     <groupId>me.ansandr</groupId>
     <artifactId>transwarp</artifactId>
-    <version>0.3.1</version>
+    <version>0.4.1</version>
     <packaging>jar</packaging>
 
     <name>TransWarp</name>

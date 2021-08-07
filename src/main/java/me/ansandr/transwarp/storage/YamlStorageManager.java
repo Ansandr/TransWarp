@@ -18,12 +18,10 @@ public class YamlStorageManager implements StorageManager {
     }
 
     @Override
-    public void setTransport(String transportName, String transportType, Location loc) {
+    public void setTransport(String transportType, String transportName, Location loc) {
         data.set(transportType + "." + transportName, loc);
         storageConfigc.saveConfig();
-
     }
-
 
    @Override
     public Location getLocation(String path) {
@@ -31,8 +29,13 @@ public class YamlStorageManager implements StorageManager {
 
     }
 
+    @Override
+    public Location getLocation(String transportType, String transportName) {
+        return data.getLocation(transportType + "." + transportName);
+    }
 
-    @Override//TODO Оптимизировать с помощью передачи пути к транспорту в конфиге (или генерация списка)
+
+    @Override
     public String getTransportType(String transportName) {
         ConfigurationSection cs = data.getConfigurationSection("");
 
@@ -56,7 +59,18 @@ public class YamlStorageManager implements StorageManager {
     @Override
     public Set<String> getTransports(String transportType) {
         ConfigurationSection cs = data.getConfigurationSection(transportType);
-
+        if (cs == null)
+            return null;
         return cs.getKeys(false);
+    }
+
+    @Override
+    public String getTransport(String transportType, String transportName) {
+        return data.getConfigurationSection(transportType + "." + transportName).getName();
+    }
+
+    @Override
+    public String getTransport(String transportType) {
+        return null;
     }
 }

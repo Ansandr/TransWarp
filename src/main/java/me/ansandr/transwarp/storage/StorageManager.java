@@ -14,7 +14,7 @@ public interface StorageManager {
      * @param transportName
      * @param transportType
      */
-    void setTransport(String transportName, String transportType, Location loc);
+    void setTransport(String transportType, String transportName, Location loc);
 
     /**
      *
@@ -30,6 +30,8 @@ public interface StorageManager {
      */
     Location getLocation(String transportName);
 
+    Location getLocation(String transportType, String transportName);
+
     /**
      * Get all transportTypes in config
      * @return
@@ -42,4 +44,8 @@ public interface StorageManager {
      * @return set of all transports of transport type
      */
     Set<String> getTransports(String transportType);
+
+    String getTransport(String transportType, String transportName);
+
+    String getTransport(String transportType);
 }
